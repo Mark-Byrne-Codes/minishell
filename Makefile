@@ -6,14 +6,14 @@
 #    By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/03/03 15:33:31 by mbyrne            #+#    #+#              #
-#    Updated: 2025/03/04 09:03:02 by mbyrne           ###   ########.fr        #
+#    Updated: 2025/03/04 09:54:52 by mbyrne           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = minishell
 
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -g  # Debugging flag (-g) is good for development
+CFLAGS = -Wall -Wextra -Werror -g
 RL_FLAGS = -lreadline
 
 LIBFT_DIR = libft
@@ -21,13 +21,11 @@ LIBFT = $(LIBFT_DIR)/libft.a
 
 INCLUDES = -Iincludes -I$(LIBFT_DIR)/includes
 
-# --- Source Files (Explicitly listed and grouped) ---
 
 SRCS_MAIN = srcs/main.c
 
 
 
-# Combine all source files
 SRCS = $(SRCS_MAIN)
 
 OBJS = $(SRCS:.c=.o)

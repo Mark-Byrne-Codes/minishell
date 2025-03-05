@@ -6,7 +6,7 @@
 #    By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/03/03 15:33:31 by mbyrne            #+#    #+#              #
-#    Updated: 2025/03/04 09:54:52 by mbyrne           ###   ########.fr        #
+#    Updated: 2025/03/05 18:02:51 by mbyrne           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,6 +23,10 @@ INCLUDES = -Iincludes -I$(LIBFT_DIR)/includes
 
 
 SRCS_MAIN = srcs/main.c
+
+SRCS_BUILTINS = srcs/builtins/ft_exit.c
+
+SRCS_UTILS = srcs/utils/exit.c
 
 
 

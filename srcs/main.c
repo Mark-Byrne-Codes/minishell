@@ -17,9 +17,17 @@ static int	init_mini(t_mini *mini, int argc, char **argv, char **envp)
 	mini->fd_in = 0;
 	mini->fd_out = 1;
 	mini->should_exit = 0;
-    mini->in_builtin = 0;
+    mini->is_builtin = 0;
     // setup signal handlers for ctrl-c and such
 	return (0);
+}
+
+void parse_line(t_mini mini, char *line)
+{
+    t_command *commands;
+    // parse the command
+
+    //execute_command(mini, commands);
 }
 
 void main_loop(t_mini *mini)
@@ -33,7 +41,7 @@ void main_loop(t_mini *mini)
             break;
         if (*line)
         //     add_history(line);
-        //process_line(mini, line);
+        //parse_line(mini, line);
         free (line);
     }
 }

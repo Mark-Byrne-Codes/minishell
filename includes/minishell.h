@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 15:33:52 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/05 18:01:01 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/05 18:07:12 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,7 @@ typedef struct s_env
  * last_pid: PID of the last forked child process.
  * exit_status: Exit status of the last command.
  * should_exit: Flag to signal exit (e.g., from 'exit' builtin).
- * in_builtin: Flag for builtins.
+ * is_builtin: Flag for builtins.
  */
 typedef struct s_mini
 {
@@ -121,7 +121,7 @@ typedef struct s_mini
 	pid_t		last_pid;
 	int			exit_status;
 	int			should_exit;
-	int			in_builtin;
+	int			is_builtin;
 }	t_mini;
 
 

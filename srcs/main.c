@@ -24,7 +24,9 @@ static int	init_mini(t_mini *mini, int argc, char **argv, char **envp)
 
 void parse_line(t_mini mini, char *line)
 {
-    t_command *commands;
+    (void)mini;
+    (void)line;
+    //t_command *commands;
     // parse the command
 
     //execute_command(mini, commands);
@@ -42,6 +44,7 @@ void main_loop(t_mini *mini)
         if (*line)
         //     add_history(line);
         //parse_line(mini, line);
+        ft_printf("line: %s\n", line);
         free (line);
     }
 }

@@ -1,25 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   builtins.c                                         :+:      :+:    :+:   */
+/*   pwd_builtin.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/06 09:17:23 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/06 09:24:46 by mbyrne           ###   ########.fr       */
+/*   Created: 2025/03/06 09:26:34 by mbyrne            #+#    #+#             */
+/*   Updated: 2025/03/06 09:29:51 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "../../includes/minishell.h"
+#include "../../includes/minishell.h"
+#include <linux/limits.h>
 
-int execute_builtin(t_mini *mini, t_command *command)
+int	pwd_builtin(void)
 {
-    (void)mini;
-    int ret;
-    // ...
-    if (ft_strcmp(command, "echo") == 0)
-        ret = ft_echo(command->argv);
+	char	cwd[PATH_MAX];
 
-    // ...
-    return (ret);
+	if (getcwd(cwd, sizeof(cwd)) == NULL)
+	{
+		perror("minishell: pwd");
+		return (1);
+	}
+	ft_putendl_fd(cwd, STDOUT_FILENO);
+	return (0);
 }

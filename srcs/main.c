@@ -3,6 +3,7 @@
 
 static int	init_mini(t_mini *mini, int argc, char **argv, char **envp)
 {
+    ft_memset(&mini, 0, sizeof(t_mini));
 	if (argc != 1)
 	{
 		ft_putstr_fd("Usage: ./minishell\n", 2);
@@ -54,7 +55,6 @@ int	main(int argc, char **argv, char **envp)
 {
 	t_mini	mini;
 
-	ft_memset(&mini, 0, sizeof(t_mini));
 	if (init_mini(&mini, argc, argv, envp) != 0)
 		return (1);
 	main_loop(&mini);

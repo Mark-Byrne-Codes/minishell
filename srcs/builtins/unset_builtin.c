@@ -1,25 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   builtins.c                                         :+:      :+:    :+:   */
+/*   unset_builtin.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/06 09:17:23 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/06 09:24:46 by mbyrne           ###   ########.fr       */
+/*   Created: 2025/03/06 09:46:30 by mbyrne            #+#    #+#             */
+/*   Updated: 2025/03/06 09:46:31 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "../../includes/minishell.h"
-
-int execute_builtin(t_mini *mini, t_command *command)
-{
-    (void)mini;
-    int ret;
-    // ...
-    if (ft_strcmp(command, "echo") == 0)
-        ret = ft_echo(command->argv);
-
-    // ...
-    return (ret);
-}

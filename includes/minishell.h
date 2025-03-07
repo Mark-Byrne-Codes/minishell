@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 15:33:52 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/06 09:27:21 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/06 13:11:08 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@
 # include <readline/history.h>
 # include <fcntl.h>
 # include <sys/wait.h>
-# include <limits.h>
 # include <stdio.h>
 # include <string.h>
 # include <sys/stat.h>
@@ -125,6 +124,15 @@ typedef struct s_mini
 	int			is_builtin;
 }	t_mini;
 
-
+void	remove_env_node(t_env **head, char *name);
+char	**env_list_to_array(t_env *head);
+t_env	*copy_env(char **envp);
+t_env	*create_env_node(char *name, char *value);
+void	add_env_node(t_env **head, t_env *new_node);
+t_env	*find_env_node(t_env *head, char *name);
+void	free_env_list(t_env *head);
+void	free_string_array(char **array);
+char	*join_and_free(char *s1, char *s2);
+void	clean_exit(t_mini *mini);
 
 #endif

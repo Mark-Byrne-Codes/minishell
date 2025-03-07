@@ -1,27 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   exit_builtin.c                                     :+:      :+:    :+:   */
+/*   env_builtin.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/06 09:46:36 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/06 09:46:37 by mbyrne           ###   ########.fr       */
+/*   Created: 2025/03/06 09:47:16 by mbyrne            #+#    #+#             */
+/*   Updated: 2025/03/06 12:31:20 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "../../includes/minishell.h"
+#include "../../includes/minishell.h"
 
-void clean_exit(t_mini *mini);
-
-int ft_exit(t_mini *mini, char **args)
+int	ft_env(t_mini *mini)
 {
-    int exit_code;
+	t_env	*current;
 
-
-    exit_code = 69;
-    (void)args;
-    ft_printf("Exiting minishell\n");
-    clean_exit(mini);
-    return (0);
+	current = mini->env;
+	while (current)
+	{
+		if (current->value && current->value[0] != '\0')
+		{
+			ft_putstr_fd(current->name, STDOUT_FILENO);
+			write(STDOUT_FILENO, "=", 1);
+			ft_putstr_fd(current->value, STDOUT_FILENO);
+			write(STDOUT_FILENO, "\n", 1);
+		}
+		current = current->next;
+	}
+	return (0);
 }

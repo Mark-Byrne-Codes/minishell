@@ -31,7 +31,7 @@ void    free_token(t_token *token)
 {
     if (!token)
         return ;
-    free(token->str);
+    free(token->string);
     free(token);
 }
 

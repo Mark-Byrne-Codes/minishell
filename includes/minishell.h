@@ -33,8 +33,24 @@ typedef enum e_token_type
 	TOKEN_REDIR_IN,
 	TOKEN_REDIR_OUT,
 	TOKEN_REDIR_APPEND,
-	TOKEN_HEREDOC
+	TOKEN_HEREDOC,
+    	TOKEN_SINGLE_Q_STRING,
+    	TOKEN_DOUBLE_Q,
+    	TOKEN_DOUBLE_Q_CONTENT
 }	t_token_type;
+
+typedef struct s_lexer
+{
+	t_list	*dictionary;
+	int		squote;
+	int		dquote;
+	int		pipes;
+	int		vars;
+	int		red_in;
+	int		red_delim;
+	int		red_out;
+	int		red_append;
+}	t_lexer;
 
 /* Represents a single token in the parsed input.  This is part of a
  * dynamically allocated *array* of tokens (managed within the t_mini struct).
@@ -43,12 +59,13 @@ typedef enum e_token_type
  * expanded: Flag: 1 if expanded, 0 if not.
  */
 
-typedef struct s_token
-{
-	t_token_type	type;
-	char			*str;
-	int				expanded;
-}	t_token;
+ typedef struct s_token
+ {
+	 t_token_type	token;
+	 char			*string;
+	 int				len;
+	 int				expanded;
+ }	t_token;
 
 /* Represents a single command to be executed. This includes the command,
  * its arguments, and any redirection information.  These form a
@@ -134,5 +151,17 @@ void	free_env_list(t_env *head);
 void	free_string_array(char **array);
 char	*join_and_free(char *s1, char *s2);
 void	clean_exit(t_mini *mini);
+
+
+
+
+//ms_lexer.c - stuff to lex, count special characters and so on
+int	parse_line(t_lexer *lexer, char *command);
+
+//ms_lexer_utilities.c - stuff to lex, count special characters and so on
+int	fun_add_entry(t_lexer *lexer, char *string, int len, t_token_type token);
+void	fun_lex_struct_init(t_lexer *lexer);
+void	fun_flag_flipper(int *flag);
+int	fun_check_ifs(unsigned int c);
 
 #endif

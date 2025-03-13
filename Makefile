@@ -40,9 +40,12 @@ SRCS_UTILS = srcs/utils/free.c \
 SRCS_ENV = srcs/env/env_list.c \
 				srcs/env/env_utils.c
 
+SRCS_PARSE = srcs/parser/ms_lexer_utils.c \
+					srcs/parser/ms_lexer.c
 
 
-SRCS = $(SRCS_MAIN) $(SRCS_ENV) $(SRCS_UTILS)
+
+SRCS = $(SRCS_MAIN) $(SRCS_ENV) $(SRCS_UTILS) $(SRCS_PARSE)
 
 OBJS = $(SRCS:srcs/%.c=$(OBJ_DIR)%.o)
 

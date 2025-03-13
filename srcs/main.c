@@ -22,19 +22,10 @@ static int	init_mini(t_mini *mini, int argc, char **argv, char **envp)
 	return (0);
 }
 
-void parse_line(t_mini mini, char *line)
-{
-    (void)mini;
-    (void)line;
-    //t_command *commands;
-    // parse the command
-
-    //execute_command(mini, commands);
-}
-
 void main_loop(t_mini *mini)
 {
     char *line;
+    t_lexer	*lex_data;
 
     while (!mini->should_exit)
     {
@@ -43,7 +34,9 @@ void main_loop(t_mini *mini)
             break;
         if (*line)
             add_history(line);
-        //parse_line(mini, line);
+
+        lex_data = malloc(sizeof(t_lexer));
+        parse_line(lex_data, line);
         if (ft_strncmp(line, "exit", 4) == 0)
             mini->should_exit = 1;
         ft_printf("line: %s\n", line);

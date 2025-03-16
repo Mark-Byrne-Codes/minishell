@@ -6,11 +6,11 @@
 /*   By: elehtone <elehtone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/09 23:17:17 by elehtone          #+#    #+#             */
-/*   Updated: 2025/03/10 18:02:24 by elehtone         ###   ########.fr       */
+/*   Updated: 2025/03/14 13:04:54 by elehtone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/minishell.h"
+#include "../../includes/minishell.h"
 
 /*
  * Adds a new entry to the dictionary. Creates pointers to a new token and node
@@ -19,18 +19,20 @@
  * Params: lexer, *string, len, token
  * Returns: nothing yet
  */
-int	fun_add_entry(t_lexer *lexer, char *string, int len, t_token_type token)
+void	*fun_add_entry(t_lexer *lexer, char *str, int len, t_token_type token)
 {
+	char	*new_string;
 	t_token	*new_token;
 	t_list	*new_node;
 
+	new_string = ft_substr(str, 0, len);
 	new_token = malloc(sizeof(t_token));
 	new_token->token = token;
-	new_token->string = string;
+	new_token->string = new_string;
 	new_token->len = len;
 	new_node = ft_lstnew(new_token);
 	ft_lstadd_back(&lexer->dictionary, new_node);
-	return (0);
+	return (str + len);
 }
 
 /*
@@ -75,61 +77,3 @@ int	fun_check_ifs(unsigned int c)
 		return (1);
 	return (0);
 }
-
-/*
- * Count the kind of redirect. Helper to fun_count_special_chars()
- * Params: *lexer, *str
- * Returns: str (address of current string location)
- 
-static void	*fun_count_redirect_chars(t_lexer *lexer, char *str)
-{
-	if (*str == '<')
-	{
-		if (*(str + 1) == '<')
-		{
-			lexer->red_delim++;
-			str++;
-		}
-		else
-			lexer->red_in++;
-	}
-	else if (*str == '>')
-	{
-		if (*(str + 1) == '>')
-		{
-			lexer->red_append++;
-			str++;
-		}
-		else
-		lexer->red_out++;
-	}
-	str++;
-	return (str);
-}
-
-
- * Count a number of characters that are not included in single or double quotes.
- * Params: *lexer, *str
- * Returns: int (number of unbounded character)
- *
-static int	fun_count_special_chars(t_lexer *lexer, char *str)
-{
-	while (*str)
-	{
-		if (*str == 39)
-			fun_flag_flipper(&lexer->single_quote_flag);
-		else if (*str == 34)
-			fun_flag_flipper(&lexer->double_quote_flag);
-		else if (*str == '$' && !lexer->single_quote_flag)
-			lexer->vars++;
-		else if (*str == '|' && !lexer->single_quote_flag && !lexer->double_quote_flag)
-			lexer->pipes++;
-		else if ((*str == '<' || *str == '>') && !lexer->single_quote_flag
-				&& !lexer->double_quote_flag)
-		{
-			str = fun_count_redirect_chars(lexer, str);
-		}
-		str++;
-	}
-	return (0);
-}*/

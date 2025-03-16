@@ -36,7 +36,8 @@ typedef enum e_token_type
 	TOKEN_HEREDOC,
     	TOKEN_SINGLE_Q_STRING,
     	TOKEN_DOUBLE_Q,
-    	TOKEN_DOUBLE_Q_CONTENT
+    	TOKEN_DOUBLE_Q_CONTENT,
+		TOKEN_IFS
 }	t_token_type;
 
 typedef struct s_lexer
@@ -157,9 +158,13 @@ void	clean_exit(t_mini *mini);
 
 //ms_lexer.c - stuff to lex, count special characters and so on
 int	parse_line(t_lexer *lexer, char *command);
+void	*fun_variable_string(t_lexer *lexer, char *cmd);
+void	*fun_word_string(t_lexer *lexer, char *cmd);
+void	*fun_double_quote_string(t_lexer *lexer, char *command);
+void	*fun_single_quote_string(t_lexer *lexer, char *command);
 
 //ms_lexer_utilities.c - stuff to lex, count special characters and so on
-int	fun_add_entry(t_lexer *lexer, char *string, int len, t_token_type token);
+void	*fun_add_entry(t_lexer *lexer, char *str, int len, t_token_type token);
 void	fun_lex_struct_init(t_lexer *lexer);
 void	fun_flag_flipper(int *flag);
 int	fun_check_ifs(unsigned int c);

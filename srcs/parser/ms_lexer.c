@@ -10,100 +10,33 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/minishell.h"
+#include "../../includes/minishell.h"
 
-/*
- * Handle strings contained within single quotes.
- * Params: *lexer, *command
- * Return: address of the first character after the quoted string ends
- */
-static void	*fun_variable_string(t_lexer *lexer, char *command)
+static void	*fun_less_greater(t_lexer *lex, char *cmd)
 {
-	int	len;
-	char	*string;
-
-	len = 0;
-	while (command[len] != '\0' && !fun_check_ifs(command[len]))
-		len++;
-	string = ft_substr(command, 0, len);
-	fun_add_entry(lexer, string, len, TOKEN_VARIABLE);
-	lexer->vars++;
-	return (command + len);
-}
-
-/*
- * Handle strings contained within single quotes.
- * Params: *lexer, *command
- * Return: address of the first character after the quoted string ends
- */
-static void	*fun_single_quote_string(t_lexer *lexer, char *command)
-{
-	int	len;
-	char	*string;
-
-	len = 0;
-	fun_flag_flipper(&lexer->squote);
-	while (command[len] != '\0' && lexer->squote == 1)
+	if (*cmd == '<' && *(cmd + 1) == '<' && !lex->squote && !lex->dquote)
 	{
-		if (command[len] == 39)
-			fun_flag_flipper(&lexer->squote);
-		len++;
+		cmd = fun_add_entry(lex, cmd, 2, TOKEN_REDIR_APPEND);
+		lex->red_delim++;
 	}
-	string = ft_substr(command, 0, len);
-	fun_add_entry(lexer, string, len, TOKEN_SINGLE_Q_STRING);
-	return (command + len);
-}
-
-/*
- * Handle strings contained within double quotes.
- * Params: *lexer, *command
- * Return: address of the first character after the quoted string ends
- */
-static void	*fun_double_quote_string(t_lexer *lexer, char *command)
-{
-	static int	len;
-	int	loc;
-	char	*string;
-
-	fun_flag_flipper(&lexer->dquote);
-	fun_add_entry(lexer, "\"", len, TOKEN_DOUBLE_Q);
-	len = 1;
-	loc = len;
-	while (command[len] != '\0' && lexer->dquote == 1)
+	else if (*cmd == '>' && *(cmd + 1) == '>' && !lex->squote && !lex->dquote)
 	{
-		if (command[len] == '$')
-		{
-			string = ft_substr(command, loc, len - loc);
-			fun_add_entry(lexer, string, len - loc, TOKEN_DOUBLE_Q_CONTENT);
-			command = fun_variable_string(lexer, command + len);
-			loc = len;
-		}
-		if (command[len] == 34)
-			fun_flag_flipper(&lexer->dquote);
-		len++;
+		cmd = fun_add_entry(lex, cmd, 2, TOKEN_HEREDOC);
+		lex->red_append++;
 	}
-	string = ft_substr(command, loc, len);
-	fun_add_entry(lexer, string, len - loc, TOKEN_DOUBLE_Q_CONTENT);
-	return (command + len);
-}
-
-/*
- * Handle plain words (commands and such with no prepositions and not contained
- * 	in any quotes)
- * Params: *lexer, *command
- * Returns: current location within command
- */
-static void	*fun_word_string(t_lexer *lexer, char *command)
-{
-	int	len;
-	char	*string;
-
-	len = 0;
-	while (command[len] != '\0' && !fun_check_ifs(command[len]))
-		len++;
-	string = ft_substr(command, 0, len);
-	fun_add_entry(lexer, string, len, TOKEN_WORD);
-	return (command + len);
+	else if (*cmd == '<' && !lex->squote && !lex->dquote)
+	{
+		cmd = fun_add_entry(lex, cmd, 1, TOKEN_REDIR_IN);
+		lex->red_in++;
+	}
+	else if (*cmd == '>' && !lex->squote && !lex->dquote)
+	{
+		cmd = fun_add_entry(lex, cmd, 1, TOKEN_REDIR_OUT);
+		lex->red_out++;
+	}
+	else
+		return (NULL);
+	return (cmd);
 }
 
 /*
@@ -114,43 +47,28 @@ static void	*fun_word_string(t_lexer *lexer, char *command)
 static void	fun_fill_dictionary(t_lexer *lexer, char *command)
 {
 	while (*command)
-	{	
+	{
 		if (*command == 39)
 			command = fun_single_quote_string(lexer, command);
 		else if (*command == 34)
 			command = fun_double_quote_string(lexer, command);
 		else if (*command == '$' && !lexer->squote)
-			fun_variable_string(lexer, command);
+			command = fun_variable_string(lexer, command);
 		else if (*command == '|' && !lexer->squote && !lexer->dquote)
 		{
-			fun_add_entry(lexer, "|", 1, TOKEN_PIPE);
+			command = fun_add_entry(lexer, command, 1, TOKEN_PIPE);
 			lexer->pipes++;
 		}
-		else if (*command == '<' && *(command + 1) == '<' && !lexer->squote && !lexer->dquote)
+		else if (*command == '<' || *command == '>')
 		{
-			fun_add_entry(lexer, "<<", 2, TOKEN_REDIR_APPEND);
-			lexer->red_delim++;
-			command++;
+			command = fun_less_greater(lexer, command);
 		}
-		else if (*command == '>' && *(command + 1) == '>' && lexer->squote && !lexer->dquote)
+		else if (fun_check_ifs(*command) && !lexer->squote && !lexer->dquote)
 		{
-			fun_add_entry(lexer, ">>", 2, TOKEN_HEREDOC);
-			lexer->red_append++;
-			command++;
-		}
-		else if (*command == '<' && !lexer->squote && !lexer->dquote)
-		{
-			fun_add_entry(lexer, "<", 1, TOKEN_REDIR_IN);
-			lexer->red_in++;
-		}
-		else if (*command == '>' && !lexer->squote && !lexer->dquote)
-		{
-			fun_add_entry(lexer, ">", 1, TOKEN_REDIR_OUT);
-			lexer->red_out++;
+			command = fun_add_entry(lexer, command, 1, TOKEN_IFS);
 		}
 		else
-			fun_word_string(lexer, command);
-		command++;
+			command = fun_word_string(lexer, command);
 	}
 }
 

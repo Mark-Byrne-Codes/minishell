@@ -41,7 +41,8 @@ SRCS_ENV = srcs/env/env_list.c \
 				srcs/env/env_utils.c
 
 SRCS_PARSE = srcs/parser/ms_lexer_utils.c \
-					srcs/parser/ms_lexer.c
+					srcs/parser/ms_lexer.c \
+					srcs/parser/ms_lexer_tokens.c
 
 
 

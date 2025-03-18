@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/28 14:58:23 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/06 09:12:48 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/18 14:40:40 by elehtone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 
 typedef struct s_list
 {
-	void			*content;
+	void	*content;
 	struct s_list	*next;
 }	t_list;
 

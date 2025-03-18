@@ -6,7 +6,7 @@
 /*   By: elehtone <elehtone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 15:09:57 by elehtone          #+#    #+#             */
-/*   Updated: 2025/03/15 01:00:03 by elehtone         ###   ########.fr       */
+/*   Updated: 2025/03/18 15:00:23 by elehtone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,12 +90,13 @@ int	parse_line(t_lexer *lexer, char *command)
 	t_list *temp = lexer->dictionary;
 	while (temp != NULL)
 	{
+		t_token *token = (t_token *)temp->content;
 		printf("Node number: %d.  ", c);
 		printf("Current content add: %p\n", &temp->content);
 		printf("Next content add: %p\n", temp->next);
-		printf("Current content: %s\n", (char *)temp->content->string);
-		printf("Current len: %d\n", temp->content->len);
-		printf("Current tok type: %d\n--\n", temp->content->token);
+		printf("Current content: %s\n", token->string);
+		printf("Current len: %d\n", token->len);
+		printf("Current tok type: %d\n--\n", token->token);
 		c++;
 		temp = temp->next;
 	}

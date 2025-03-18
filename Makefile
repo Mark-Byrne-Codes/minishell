@@ -6,14 +6,14 @@
 #    By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/03/03 15:33:31 by mbyrne            #+#    #+#              #
-#    Updated: 2025/03/06 13:14:23 by mbyrne           ###   ########.fr        #
+#    Updated: 2025/03/18 16:23:12 by elehtone         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = minishell
 
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -g
+CFLAGS = -Wall -Wextra -Werror -g #-fsanitize=address
 RL_FLAGS = -lreadline
 
 GREEN   = \033[0;32m
@@ -40,9 +40,13 @@ SRCS_UTILS = srcs/utils/free.c \
 SRCS_ENV = srcs/env/env_list.c \
 				srcs/env/env_utils.c
 
+SRCS_PARSE = srcs/parser/ms_lexer_utils.c \
+					srcs/parser/ms_lexer.c \
+					srcs/parser/ms_lexer_tokens.c
 
 
-SRCS = $(SRCS_MAIN) $(SRCS_ENV) $(SRCS_UTILS)
+
+SRCS = $(SRCS_MAIN) $(SRCS_ENV) $(SRCS_UTILS) $(SRCS_PARSE)
 
 OBJS = $(SRCS:srcs/%.c=$(OBJ_DIR)%.o)
 

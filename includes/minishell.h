@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 15:33:52 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/11 18:49:18 by elehtone         ###   ########.fr       */
+/*   Updated: 2025/03/18 18:08:21 by elehtone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,8 @@ typedef enum e_token_type
 	TOKEN_HEREDOC,
     	TOKEN_SINGLE_Q_STRING,
     	TOKEN_DOUBLE_Q,
-    	TOKEN_DOUBLE_Q_CONTENT
+    	TOKEN_DOUBLE_Q_CONTENT,
+	TOKEN_IFS
 }	t_token_type;
 
 typedef struct s_lexer
@@ -52,13 +53,20 @@ typedef struct s_lexer
 	int		red_append;
 }	t_lexer;
 
-typedef struct s_token
-{
-	t_token_type	token;
-	char			*string;
-	int				len;
-	int				expanded;
-}	t_token;
+/* Represents a single token in the parsed input.  This is part of a
+ * dynamically allocated *array* of tokens (managed within the t_mini struct).
+ * type: The type of the token (see e_token_type).
+ * str: The string value of the token (dynamically allocated).
+ * expanded: Flag: 1 if expanded, 0 if not.
+ */
+
+ typedef struct s_token
+ {
+	 t_token_type	token;
+	 char			*string;
+	 int				len;
+	 int				expanded;
+ }	t_token;
 
 /* Represents a single command to be executed. This includes the command,
  * its arguments, and any redirection information.  These form a
@@ -144,14 +152,22 @@ void	free_env_list(t_env *head);
 void	free_string_array(char **array);
 char	*join_and_free(char *s1, char *s2);
 void	clean_exit(t_mini *mini);
+void    free_token(t_token *token);
 
-//ms_lexer.c - stuff to lex, count special characters and so on
+//ms_lexer.c - Superman's worst enemy
 int	parse_line(t_lexer *lexer, char *command);
 
-//ms_lexer_utilities.c - stuff to lex, count special characters and so on
-int	fun_add_entry(t_lexer *lexer, char *string, int len, t_token_type token);
+//ms_lexer_tokens.c - functions to handle assigning tokens
+void	*fun_variable_string(t_lexer *lexer, char *command);
+void	*fun_word_string(t_lexer *lexer, char *command);
+void	*fun_double_quote_string(t_lexer *lexer, char *command);
+void	*fun_single_quote_string(t_lexer *lexer, char *command);
+
+//ms_lexer_utils.c - helpers for the lexer, list handling
 void	fun_lex_struct_init(t_lexer *lexer);
+void	*fun_add_entry(t_lexer *lexer, char *str, int len, t_token_type token);
 void	fun_flag_flipper(int *flag);
 int	fun_check_ifs(unsigned int c);
+void	unfun_add_entry_fail(t_lexer *lexer, int end);
 
 #endif

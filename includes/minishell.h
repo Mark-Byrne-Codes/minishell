@@ -77,6 +77,13 @@ typedef struct s_lexer
 	 int				expanded;
  }	t_token;
 
+typedef struct s_redirection
+{
+	int             type;
+	char            *file;
+	struct s_redirection *next;
+} t_redirection;
+
 /* Represents a single command to be executed. This includes the command,
  * its arguments, and any redirection information.  These form a
  * dynamically allocated *array* of commands (managed within t_mini).
@@ -99,9 +106,11 @@ typedef struct s_command
 	int		has_output_redir;
 	int		append;
 	int		is_heredoc;
-	struct s_mini *mini;  // Add reference to mini struct
-	t_token_type    redir_type;    // Type of redirection
-	char            *redir_file;    // Name of redirection file/delimiter
+	struct s_mini	*mini;
+	int		redir_type;
+	char	*redir_file;
+	int		error;
+	t_redirection   *redirections;
 }	t_command;
 
 /* Represents a single environment variable (NAME=value).  These form a
@@ -202,6 +211,16 @@ void free_commands(t_mini *mini);
 void free_tokens(t_mini *mini);
 int	init_commands(t_mini *mini, int num_commands);
 int	add_argument(t_command *cmd, char *arg, int arg_idx);
+void free_redirections(t_command *cmd);
+char	*remove_quotes(const char *str);
+int		setup_heredoc_delim(t_command *cmd, char *delim);
+int		setup_input_redir_file(t_command *cmd, char *file);
+int		setup_output_redir_file(t_command *cmd, char *file, int append);
+int		apply_redirections(t_command *cmd);
+char	*remove_quotes(const char *str);
+void	file_error(t_mini *mini, t_command *cmd, char *file);
+void	print_error(t_mini *mini, char *cmd, char *msg, int status);
+int	execute_single_command(t_mini *mini, int i);
 
 
 //ms_lexer.c - stuff to lex, count special characters and so on
@@ -224,5 +243,11 @@ char    *expand_token(t_mini *mini, t_token *token);
 char    *expand_variables(t_mini *mini, char *str, int in_quotes);
 char    *expand_tilde(t_mini *mini, char *str);
 char    *ft_strjoinchar(const char *s1, char c);
+
+int	ms_handle_pipe(t_mini *mini, t_list **temp, int *cmd_idx, int *arg_idx);
+int	ms_handle_token_expansion(t_mini *mini, t_command *cmd, 
+		t_token *token, int *arg_idx);
+int	ms_handle_redirection(t_mini *mini, t_command *cmd, t_list **temp);
+int	ms_process_tokens(t_mini *mini, t_lexer *lexer);
 
 #endif

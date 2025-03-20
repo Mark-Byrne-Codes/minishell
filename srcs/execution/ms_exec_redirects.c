@@ -12,241 +12,89 @@
 
 #include "../../includes/minishell.h"
 
-// Function prototypes for this file only
-static int setup_input_redir(t_command *cmd);
-static int setup_output_redir(t_command *cmd, int append);
-static int setup_heredoc(t_command *cmd);
-static char *remove_quotes(const char *str);
+static int	process_redirection(t_mini *mini, t_command *cmd, t_redirection *r);
 
-// Handle all redirections for a command
-int handle_redirection(t_mini *mini, t_command *cmd)
+/**
+ * Handles all redirections for a command
+ * Processes each redirection in the command's redirection list
+ */
+int	handle_redirection(t_mini *mini, t_command *cmd)
 {
-    (void)mini;
-    
-    // We need to handle all redirections, not just one
-    // This is a placeholder - we need to modify the parser to store all redirections
-    // For now, let's just handle the one we have
-    if (cmd->redir_file)
-    {
-        int redir_error = 0;
-        switch (cmd->redir_type)
-        {
-            case TOKEN_REDIR_IN:
-                if (setup_input_redir(cmd) == ERROR)
-                    redir_error = 1;
-                break;
-            case TOKEN_REDIR_OUT:
-                if (setup_output_redir(cmd, 0) == ERROR)
-                    redir_error = 1;
-                break;
-            case TOKEN_REDIR_APPEND:
-                if (setup_output_redir(cmd, 1) == ERROR)
-                    redir_error = 1;
-                break;
-            case TOKEN_HEREDOC:
-                if (setup_heredoc(cmd) == ERROR)
-                    redir_error = 1;
-                break;
-            default:
-                break;
-        }
-        if (redir_error)
-        {
-            mini->exit_status = 1;
-            return (ERROR);
-        }
-    }
+	t_redirection	*redir;
+	int				redir_error;
 
-    // Apply the redirections
-    if (cmd->has_input_redir && cmd->fd_in != STDIN_FILENO)
-    {
-        if (dup2(cmd->fd_in, STDIN_FILENO) == -1)
-            return (ERROR);
-        if (!cmd->is_heredoc)
-            close(cmd->fd_in);
-    }
-    
-    if (cmd->has_output_redir && cmd->fd_out != STDOUT_FILENO)
-    {
-        if (dup2(cmd->fd_out, STDOUT_FILENO) == -1)
-            return (ERROR);
-        close(cmd->fd_out);
-    }
-    
-    return (SUCCESS);
+	redir = cmd->redirections;
+	redir_error = 0;
+	while (redir && !redir_error)
+	{
+		if (process_redirection(mini, cmd, redir) == ERROR)
+			redir_error = 1;
+		redir = redir->next;
+	}
+	if (redir_error)
+	{
+		mini->exit_status = 1;
+		return (ERROR);
+	}
+	if (apply_redirections(cmd) == ERROR)
+		return (ERROR);
+	return (SUCCESS);
 }
 
-// Handle regular input redirection (<)
-static int setup_input_redir(t_command *cmd)
+/**
+ * Processes a single redirection
+ * Calls the appropriate setup function based on the redirection type
+ */
+static int	process_redirection(t_mini *mini, t_command *cmd, t_redirection *r)
 {
-    int fd;
-
-    if (!cmd->redir_file)
-        return (ERROR);
-    
-    // Remove quotes from filename if present
-    char *unquoted_file = remove_quotes(cmd->redir_file);
-    if (!unquoted_file)
-        return (ERROR);
-    
-    fd = open(unquoted_file, O_RDONLY);
-    if (fd == -1)
-    {
-        ft_putstr_fd("minishell: ", 2);
-        perror(unquoted_file);
-        free(unquoted_file);
-        return (ERROR);
-    }
-    
-    free(unquoted_file);
-    cmd->fd_in = fd;
-    cmd->has_input_redir = 1;
-    return (SUCCESS);
+	(void)mini;
+	if (r->type == TOKEN_REDIR_IN)
+		return (setup_input_redir_file(cmd, r->file));
+	else if (r->type == TOKEN_REDIR_OUT)
+		return (setup_output_redir_file(cmd, r->file, 0));
+	else if (r->type == TOKEN_REDIR_APPEND)
+		return (setup_output_redir_file(cmd, r->file, 1));
+	else if (r->type == TOKEN_HEREDOC)
+		return (setup_heredoc_delim(cmd, r->file));
+	return (SUCCESS);
 }
 
-// Handle heredoc (<<)
-static int setup_heredoc(t_command *cmd)
+/**
+ * Applies the redirections to the current process
+ * Uses dup2 to redirect standard input/output
+ */
+int	apply_redirections(t_command *cmd)
 {
-    int     pipe_fd[2];
-    char    *line;
-    char    *expanded_line;
-    char    *unquoted_delimiter;
-
-    if (pipe(pipe_fd) == -1)
-        return (ERROR);
-
-    // Remove quotes from delimiter if present
-    unquoted_delimiter = remove_quotes(cmd->redir_file);
-    if (!unquoted_delimiter)
-    {
-        close(pipe_fd[0]);
-        close(pipe_fd[1]);
-        return (ERROR);
-    }
-
-    while (1)
-    {
-        line = readline("> ");
-        if (!line)
-        {
-            close(pipe_fd[0]);
-            close(pipe_fd[1]);
-            free(unquoted_delimiter);
-            return (ERROR);
-        }
-        
-        if (ft_strcmp(line, unquoted_delimiter) == 0)
-        {
-            free(line);
-            free(unquoted_delimiter);
-            break;
-        }
-        
-        // Expand variables in the heredoc content
-        expanded_line = expand_variables(cmd->mini, line, 0);
-        free(line);
-        if (!expanded_line)
-        {
-            close(pipe_fd[0]);
-            close(pipe_fd[1]);
-            free(unquoted_delimiter);
-            return (ERROR);
-        }
-        
-        write(pipe_fd[1], expanded_line, ft_strlen(expanded_line));
-        write(pipe_fd[1], "\n", 1);
-        free(expanded_line);
-    }
-
-    close(pipe_fd[1]);
-    cmd->fd_in = pipe_fd[0];
-    cmd->has_input_redir = 1;
-    cmd->is_heredoc = 1;
-    return (SUCCESS);
+	if (cmd->has_input_redir && cmd->fd_in != STDIN_FILENO)
+	{
+		if (dup2(cmd->fd_in, STDIN_FILENO) == -1)
+			return (ERROR);
+		if (!cmd->is_heredoc)
+			close(cmd->fd_in);
+	}
+	if (cmd->has_output_redir && cmd->fd_out != STDOUT_FILENO)
+	{
+		if (dup2(cmd->fd_out, STDOUT_FILENO) == -1)
+			return (ERROR);
+		close(cmd->fd_out);
+	}
+	return (SUCCESS);
 }
 
-// Handle output redirection (> and >>)
-static int setup_output_redir(t_command *cmd, int append)
+/**
+ * Restores the original file descriptors
+ * Used after command execution to restore the shell's I/O
+ */
+void	restore_io(int saved_stdin, int saved_stdout)
 {
-    int fd;
-    int flags;
-
-    flags = O_WRONLY | O_CREAT;
-    if (append)
-        flags |= O_APPEND;
-    else
-        flags |= O_TRUNC;
-    
-    if (!cmd->redir_file)
-        return (ERROR);
-    
-    // Remove quotes from filename if present
-    char *unquoted_file = remove_quotes(cmd->redir_file);
-    if (!unquoted_file)
-        return (ERROR);
-    
-    fd = open(unquoted_file, flags, 0644);
-    if (fd == -1)
-    {
-        ft_putstr_fd("minishell: ", 2);
-        perror(unquoted_file);
-        free(unquoted_file);
-        return (ERROR);
-    }
-    
-    free(unquoted_file);
-    cmd->fd_out = fd;
-    cmd->has_output_redir = 1;
-    cmd->append = append;
-    return (SUCCESS);
-}
-
-// Restore original file descriptors
-void restore_io(int saved_stdin, int saved_stdout) 
-{
-    if (saved_stdin != STDIN_FILENO) {
-        dup2(saved_stdin, STDIN_FILENO);
-        close(saved_stdin);
-    }
-    
-    if (saved_stdout != STDOUT_FILENO) {
-        dup2(saved_stdout, STDOUT_FILENO);
-        close(saved_stdout);
-    }
-}
-
-// Add helper function at the top of the file
-static char *remove_quotes(const char *str)
-{
-    // More robust approach - handle quotes properly
-    int i, j;
-    int len = ft_strlen(str);
-    char *result = malloc(len + 1);
-    int in_single_quote = 0;
-    int in_double_quote = 0;
-    
-    if (!result)
-        return (NULL);
-    
-    i = 0;
-    j = 0;
-    while (str[i])
-    {
-        // Handle quotes based on context
-        if (str[i] == '\'' && !in_double_quote)
-        {
-            in_single_quote = !in_single_quote;
-        }
-        else if (str[i] == '"' && !in_single_quote)
-        {
-            in_double_quote = !in_double_quote;
-        }
-        else
-        {
-            result[j++] = str[i];
-        }
-        i++;
-    }
-    result[j] = '\0';
-    return (result);
+	if (saved_stdin != STDIN_FILENO)
+	{
+		dup2(saved_stdin, STDIN_FILENO);
+		close(saved_stdin);
+	}
+	if (saved_stdout != STDOUT_FILENO)
+	{
+		dup2(saved_stdout, STDOUT_FILENO);
+		close(saved_stdout);
+	}
 }

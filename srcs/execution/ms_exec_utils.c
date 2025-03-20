@@ -1,5 +1,4 @@
 #include "../../includes/minishell.h"
-#include "../../libft/libft.h"
 
 int	add_argument(t_command *cmd, char *arg, int arg_idx)
 {
@@ -43,6 +42,7 @@ static void	init_command(t_command *cmd, t_mini *mini)
 	cmd->mini = mini;
 	cmd->redir_type = 0;
 	cmd->redir_file = NULL;
+	cmd->error = 0;
 }
 
 int	init_commands(t_mini *mini, int num_commands)
@@ -60,4 +60,57 @@ int	init_commands(t_mini *mini, int num_commands)
 		i++;
 	}
 	return (SUCCESS);
+}
+
+char *get_command_path(char *cmd, t_env *env)
+{
+	char	*path;
+	char	**dirs;
+	int		i;
+
+	if (ft_strchr(cmd, '/'))
+		return (cmd);
+	path = get_env_value(env, "PATH");
+	dirs = ft_split(path, ':');
+	i = -1;
+	while (dirs[++i])
+	{
+		path = ft_strjoin3(dirs[i], "/", cmd);
+		if (access(path, X_OK) == 0)
+		{
+			free_string_array(dirs);
+			return (path);
+		}
+		free(path);
+	}
+	free_string_array(dirs);
+	return (NULL);
+}
+
+int	wait_for_children(t_mini *mini, int last_status)
+{
+	int		status;
+	int		last_exit_status;
+	pid_t	pid;
+
+	last_exit_status = 0;
+	pid = waitpid(-1, &status, WUNTRACED);
+	while (pid > 0)
+	{
+		if (pid == mini->last_pid)
+		{
+			if (WIFEXITED(status))
+			{
+				mini->exit_status = WEXITSTATUS(status);
+				last_exit_status = mini->exit_status;
+			}
+			else if (WIFSIGNALED(status))
+				mini->exit_status = 128 + WTERMSIG(status);
+		}
+		pid = waitpid(-1, &status, WUNTRACED);
+	}
+	if (last_status != ERROR)
+		return (last_exit_status);
+	mini->exit_status = last_status;
+	return (mini->exit_status);
 }

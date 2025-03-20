@@ -44,7 +44,9 @@ SRCS_BUILTINS = srcs/builtins/exit_builtin.c \
 
 SRCS_UTILS = srcs/utils/free.c \
 				srcs/utils/helpers.c \
-				srcs/utils/prompt.c
+				srcs/utils/prompt.c \
+				srcs/utils/string_utils.c \
+				srcs/utils/error.c \
 
 SRCS_ENV = srcs/env/env_list.c \
 				srcs/env/env_utils.c
@@ -54,11 +56,15 @@ SRCS_EXEC = srcs/utils/signals.c \
 				srcs/execution/ms_exec_redirects.c \
 				srcs/execution/ms_exec_pipes.c \
 				srcs/execution/ms_exec_utils.c \
-
+				srcs/execution/ms_exec_utils_2.c \
+				srcs/execution/ms_exec_external.c \
+				srcs/execution/ms_exec_heredoc.c
+ 
 SRCS_PARSE = srcs/parser/ms_lexer_utils.c \
 					srcs/parser/ms_lexer.c \
 					srcs/parser/ms_lexer_tokens.c \
 					srcs/parser/ms_expand.c \
+					srcs/parser/ms_parser_utils.c
 
 
 SRCS = $(SRCS_MAIN) $(SRCS_ENV) $(SRCS_UTILS) $(SRCS_BUILTINS) $(SRCS_EXEC) $(SRCS_PARSE)

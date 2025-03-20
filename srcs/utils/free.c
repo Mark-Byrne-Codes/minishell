@@ -91,27 +91,55 @@ void free_tokens(t_mini *mini)
     }
 }
 
+void free_redirections(t_command *cmd)
+{
+    t_redirection *current;
+    t_redirection *next;
+
+    current = cmd->redirections;
+    while (current)
+    {
+        next = current->next;
+        if (current->file)
+            free(current->file);
+        free(current);
+        current = next;
+    }
+    cmd->redirections = NULL;
+}
+
 void free_commands(t_mini *mini)
 {
     int i;
 
-    if (mini->commands)
+    if (!mini->commands)
+        return;
+    
+    i = 0;
+    while (i < mini->num_commands)
     {
-        i = 0;
-        while (i < mini->num_commands)
-        {
-            free(mini->commands[i].args);
-            mini->commands[i].args = NULL;
-            if (mini->commands[i].fd_in > 2)
-                close(mini->commands[i].fd_in);
-            if (mini->commands[i].fd_out > 2)
-                close(mini->commands[i].fd_out);
-            i++;
-        }
-        free(mini->commands);
-        mini->commands = NULL;
-        mini->num_commands = 0;
+        if (mini->commands[i].args)
+            free_string_array(mini->commands[i].args);
+        if (mini->commands[i].redir_file)
+            free(mini->commands[i].redir_file);
+        free_redirections(&mini->commands[i]);
+        if (mini->commands[i].fd_in != STDIN_FILENO)
+            close(mini->commands[i].fd_in);
+        
+        if (mini->commands[i].fd_out != STDOUT_FILENO)
+            close(mini->commands[i].fd_out);
+        
+        if (mini->commands[i].pipe_read != -1)
+            close(mini->commands[i].pipe_read);
+        
+        if (mini->commands[i].pipe_write != -1)
+            close(mini->commands[i].pipe_write);
+        
+        i++;
     }
+    
+    free(mini->commands);
+    mini->commands = NULL;
 }
 
 void    free_token(t_token *token)

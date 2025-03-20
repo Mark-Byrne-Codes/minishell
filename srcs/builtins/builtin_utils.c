@@ -12,17 +12,19 @@
 
 # include "../../includes/minishell.h"
 
-int execute_builtin(t_mini *mini, t_command *command)
+bool is_builtin(char *command)
 {
-    int ret;
-    // ...
-    if (ft_strcmp(command, "echo") == 0)
-        ret = ft_echo(command->argv);
-    if (ft_strcmp(command, "pwd") == 0)
-        ret = ft_pwd();
-    if (ft_strcmp(command, "env") == 0)
-        ret = ft_env(mini);
-
-    // ...
-    return (ret);
+    if (command == NULL)
+        return (false);
+    if (ft_strcmp(command, "echo") == 0 ||
+        ft_strcmp(command, "cd") == 0 ||
+        ft_strcmp(command, "pwd") == 0 ||
+        ft_strcmp(command, "export") == 0 ||
+        ft_strcmp(command, "unset") == 0 ||
+        ft_strcmp(command, "env") == 0 ||
+        ft_strcmp(command, "exit") == 0)
+    {
+        return (true);
+    }
+    return(false);
 }

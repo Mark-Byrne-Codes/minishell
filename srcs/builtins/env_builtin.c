@@ -12,7 +12,7 @@
 
 #include "../../includes/minishell.h"
 
-int	ft_env(t_mini *mini)
+int	env_builtin(t_mini *mini)
 {
 	t_env	*current;
 

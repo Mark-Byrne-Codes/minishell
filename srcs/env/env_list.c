@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 11:33:17 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/06 12:31:43 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/16 15:35:56 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,8 +55,22 @@ void	add_env_node(t_env **head, t_env *new_node)
 	current->next = new_node;
 }
 
+char *get_env_value(t_env *env, char *key)
+{
+    if (!env || !key || !*key)
+        return (NULL);
+    
+    while (env)
+    {
+        if (env->name && ft_strcmp(env->name, key) == 0)
+            return (env->value);
+        env = env->next;
+    }
+    return (NULL);
+}
+
 //find env node
-t_env	*find_env_node(t_env *head, char *name)
+t_env	*find_env_node(t_env *head, const char *name)
 {
 	while (head)
 	{
@@ -81,4 +95,3 @@ void	free_env_list(t_env *head)
 		free(temp);
 	}
 }
-

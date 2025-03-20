@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../includes/minishell.h"
+#include "../includes/minishell.h"
 
 /*
  * Handle strings contained within single quotes.
@@ -53,24 +53,36 @@ void	*fun_word_string(t_lexer *lexer, char *cmd)
  */
 void	*fun_double_quote_string(t_lexer *lexer, char *command)
 {
+	char *start;
+	int len;
+	char *content;
+
 	fun_flag_flipper(&lexer->dquote);
-	fun_add_entry(lexer, command, 1, TOKEN_DOUBLE_Q);
-	command++;
-	while (*command != '\0' && *command != 34)
-	{
-		if (*command == '$')
-			command = fun_variable_string(lexer, command);
-		else if (fun_check_ifs(*command))
-			command = fun_add_entry(lexer, command, 1, TOKEN_IFS);
-		else
-			command = fun_word_string(lexer, command);
-	}
-	if (*command == 34)
+	start = command + 1; // Skip the opening quote
+	len = 0;
+	while (start[len] != '\0' && start[len] != '"')
+		len++;
+
+	// Extract the content between quotes
+	content = ft_substr(start, 0, len);
+	if (!content)
+		return (NULL);
+
+	// Add the content as a word token
+	fun_add_entry(lexer, content, len, TOKEN_WORD);
+	free(content);
+
+	// Skip past the closing quote if we found one
+	if (start[len] == '"')
 	{
 		fun_flag_flipper(&lexer->dquote);
-		command = fun_add_entry(lexer, command, 1, TOKEN_DOUBLE_Q);
+		return (start + len + 1);
 	}
-	return (command);
+	else
+	{
+		// No closing quote found
+		return (start + len);
+	}
 }
 
 /*
@@ -80,16 +92,34 @@ void	*fun_double_quote_string(t_lexer *lexer, char *command)
  */
 void	*fun_single_quote_string(t_lexer *lexer, char *command)
 {
-	int	len;
+	char *start;
+	int len;
+	char *content;
 
 	fun_flag_flipper(&lexer->squote);
-	len = 1;
-	while (command[len] != '\0' && lexer->squote == 1)
-	{
-		if (command[len] == 39)
-			fun_flag_flipper(&lexer->squote);
+	start = command + 1; // Skip the opening quote
+	len = 0;
+	while (start[len] != '\0' && start[len] != '\'')
 		len++;
+
+	// Extract the content between quotes
+	content = ft_substr(start, 0, len);
+	if (!content)
+		return (NULL);
+
+	// Add the content as a word token
+	fun_add_entry(lexer, content, len, TOKEN_WORD);
+	free(content);
+
+	// Skip past the closing quote if we found one
+	if (start[len] == '\'')
+	{
+		fun_flag_flipper(&lexer->squote);
+		return (start + len + 1);
 	}
-	command = fun_add_entry(lexer, command, len, TOKEN_SINGLE_Q_STRING);
-	return (command);
+	else
+	{
+		// No closing quote found
+		return (start + len);
+	}
 }

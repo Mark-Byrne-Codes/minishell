@@ -6,7 +6,7 @@
 #    By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/03/03 15:33:31 by mbyrne            #+#    #+#              #
-#    Updated: 2025/03/06 13:14:23 by mbyrne           ###   ########.fr        #
+#    Updated: 2025/03/16 15:47:00 by mbyrne           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,22 +32,37 @@ INCLUDES = -Iincludes -I$(LIBFT_DIR)/includes
 
 SRCS_MAIN = srcs/main.c
 
-SRCS_BUILTINS = srcs/builtins/ft_exit.c
+SRCS_BUILTINS = srcs/builtins/exit_builtin.c \
+				srcs/builtins/echo_builtin.c \
+				srcs/builtins/pwd_builtin.c \
+				srcs/builtins/env_builtin.c \
+				srcs/builtins/cd_builtin.c \
+				srcs/builtins/export_builtin.c \
+				srcs/builtins/unset_builtin.c \
+				srcs/builtins/builtin_utils.c
+				
 
 SRCS_UTILS = srcs/utils/free.c \
-				srcs/utils/helpers.c
+				srcs/utils/helpers.c \
+				srcs/utils/prompt.c
 
 SRCS_ENV = srcs/env/env_list.c \
 				srcs/env/env_utils.c
 
+SRCS_EXEC = srcs/utils/signals.c \
+				srcs/execution/ms_exec_cmds.c \
+				srcs/execution/ms_exec_redirects.c \
+				srcs/execution/ms_exec_pipes.c \
+				srcs/execution/ms_exec_utils.c \
+
 SRCS_PARSE = srcs/parser/ms_lexer_utils.c \
 					srcs/parser/ms_lexer.c \
-					srcs/parser/ms_lexer_tokens.c
+					srcs/parser/ms_lexer_tokens.c \
+					srcs/parser/ms_expand.c \
 
 
-
-SRCS = $(SRCS_MAIN) $(SRCS_ENV) $(SRCS_UTILS) $(SRCS_PARSE)
-
+SRCS = $(SRCS_MAIN) $(SRCS_ENV) $(SRCS_UTILS) $(SRCS_BUILTINS) $(SRCS_EXEC) $(SRCS_PARSE)
+ 
 OBJS = $(SRCS:srcs/%.c=$(OBJ_DIR)%.o)
 
 
@@ -78,3 +93,5 @@ fclean: clean
 re: fclean all
 
 .PHONY: all clean fclean re
+
+

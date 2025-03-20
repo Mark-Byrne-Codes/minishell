@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 09:17:19 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/09 13:24:43 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/09 15:42:38 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,17 +21,31 @@ static void	print_cd_error(char *path)
 	ft_putstr_fd("\n", STDERR_FILENO);
 }
 
-static void	update_env_variable(t_mini *mini, const char *var_name,
-		const char *new_value)
+static char	*safe_strdup(const char *str)
+{
+	if (str)
+		return (ft_strdup(str));
+	return (NULL);
+}
+
+void	update_env_variable(t_mini *mini, char *var_name, char *new_value)
 {
 	t_env	*env_node;
-	char	*value_copy;
 	t_env	*new_node;
+	char	*value_copy;
 
 	env_node = find_env_node(mini->env, var_name);
-	value_copy = ft_strdup(new_value);
+	value_copy = safe_strdup(new_value);
 	if (env_node)
-		env_node->value = value_copy;
+	{
+		if (new_value)
+		{
+			free(env_node->value);
+			env_node->value = value_copy;
+		}
+		else
+			free(value_copy);
+	}
 	else
 	{
 		new_node = malloc(sizeof(t_env));

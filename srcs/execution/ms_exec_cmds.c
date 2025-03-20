@@ -28,44 +28,47 @@ int	execute_commands(t_mini *mini)
 		saved_stdout = dup(STDOUT_FILENO);
 		if (saved_stdin == -1 || saved_stdout == -1)
 			return (ERROR);
+
 		if (setup_pipes(mini, i) == ERROR)
 		{
 			restore_io(saved_stdin, saved_stdout);
 			return (ERROR);
 		}
-		
-		// Handle pipes first
-		if (i < mini->num_commands - 1 && 
-			dup2(mini->commands[i].pipe_write, STDOUT_FILENO) == -1)
-			return (ERROR);
-		if (i > 0 && dup2(mini->commands[i].pipe_read, STDIN_FILENO) == -1)
-			return (ERROR);
-		
+
+		if (i < mini->num_commands - 1)
+		{
+			if (dup2(mini->commands[i].pipe_write, STDOUT_FILENO) == -1)
+				return (ERROR);
+		}
+		if (i > 0)
+		{
+			if (dup2(mini->commands[i].pipe_read, STDIN_FILENO) == -1)
+				return (ERROR);
+		}
+
 		if (mini->commands[i].is_builtin && mini->num_commands == 1)
 		{
-			// Apply redirections for builtins in the parent process
-			if (handle_redirection(mini, &mini->commands[i]) == ERROR)
-			{
-				restore_io(saved_stdin, saved_stdout);
-				continue;
-			}
 			status = execute_builtin(mini, i);
 		}
 		else
 		{
-			// For non-builtins, redirections are handled in the child process
 			status = launch_external(mini, i);
 		}
-		
+
 		if (status == ERROR)
 			pipe_failed = 1;
+
 		if (mini->commands[i].pipe_write != -1)
 			close(mini->commands[i].pipe_write);
 		if (mini->commands[i].pipe_read != -1)
 			close(mini->commands[i].pipe_read);
+
 		restore_io(saved_stdin, saved_stdout);
 	}
-	status = wait_for_children(mini, pipe_failed ? ERROR : status);
+	if (pipe_failed)
+		status = wait_for_children(mini, ERROR);
+	else
+		status = wait_for_children(mini, status);
 	return (status);
 }
 
@@ -105,10 +108,6 @@ int	launch_external(t_mini *mini, int cmd_idx)
 				dup2(mini->commands[cmd_idx].pipe_read, STDIN_FILENO);
 			if (cmd_idx < mini->num_commands - 1 && mini->commands[cmd_idx].pipe_write != -1)
 				dup2(mini->commands[cmd_idx].pipe_write, STDOUT_FILENO);
-			
-			// Apply redirections in the child process
-			handle_redirection(mini, &mini->commands[cmd_idx]);
-			
 			exit(execute_builtin(mini, cmd_idx));
 		}
 		else if (pid < 0)
@@ -140,10 +139,6 @@ int	launch_external(t_mini *mini, int cmd_idx)
 			dup2(mini->commands[cmd_idx].pipe_read, STDIN_FILENO);
 		if (cmd_idx < mini->num_commands - 1 && mini->commands[cmd_idx].pipe_write != -1)
 			dup2(mini->commands[cmd_idx].pipe_write, STDOUT_FILENO);
-		
-		// Apply redirections in the child process
-		handle_redirection(mini, &mini->commands[cmd_idx]);
-		
 		execve(cmd_path,
 			mini->commands[cmd_idx].args, env_list_to_array(mini->env));
 		if (cmd_idx == 0)

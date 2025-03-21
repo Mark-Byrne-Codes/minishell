@@ -86,5 +86,6 @@ int	launch_external(t_mini *mini, int cmd_idx)
 	}
 	result = execute_child_process(mini, cmd_idx, cmd_path);
 	free(cmd_path);
+	mini->commands[cmd_idx].args = NULL;
 	return (result);
 }

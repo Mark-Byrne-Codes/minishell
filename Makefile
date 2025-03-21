@@ -6,7 +6,7 @@
 #    By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/03/03 15:33:31 by mbyrne            #+#    #+#              #
-#    Updated: 2025/03/16 15:47:00 by mbyrne           ###   ########.fr        #
+#    Updated: 2025/03/21 09:54:11 by mbyrne           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -64,7 +64,8 @@ SRCS_PARSE = srcs/parser/ms_lexer_utils.c \
 					srcs/parser/ms_lexer.c \
 					srcs/parser/ms_lexer_tokens.c \
 					srcs/parser/ms_expand.c \
-					srcs/parser/ms_parser_utils.c
+					srcs/parser/ms_parser_utils.c \
+					srcs/parser/ms_expand_utils.c \
 
 
 SRCS = $(SRCS_MAIN) $(SRCS_ENV) $(SRCS_UTILS) $(SRCS_BUILTINS) $(SRCS_EXEC) $(SRCS_PARSE)

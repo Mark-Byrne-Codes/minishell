@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 15:33:52 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/18 09:06:23 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/21 09:54:59 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -221,6 +221,9 @@ char	*remove_quotes(const char *str);
 void	file_error(t_mini *mini, t_command *cmd, char *file);
 void	print_error(t_mini *mini, char *cmd, char *msg, int status);
 int	execute_single_command(t_mini *mini, int i);
+char	*get_var_name(const char *str);
+char	*expand_exit_status(t_mini *mini);
+char	*expand_env_var(t_mini *mini, const char *var_name);
 
 
 //ms_lexer.c - stuff to lex, count special characters and so on

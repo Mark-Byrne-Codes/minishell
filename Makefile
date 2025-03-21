@@ -61,6 +61,7 @@ SRCS_EXEC = srcs/utils/signals.c \
 				srcs/execution/ms_exec_heredoc.c
  
 SRCS_PARSE = srcs/parser/ms_lexer_utils.c \
+					srcs/parser/ms_lexer_utils2.c \
 					srcs/parser/ms_lexer.c \
 					srcs/parser/ms_lexer_tokens.c \
 					srcs/parser/ms_expand.c \

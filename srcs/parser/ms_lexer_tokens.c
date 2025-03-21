@@ -6,7 +6,7 @@
 /*   By: elehtone <elehtone@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/15 00:27:13 by elehtone          #+#    #+#             */
-/*   Updated: 2025/03/15 01:02:02 by elehtone         ###   ########.fr       */
+/*   Updated: 2025/03/20 19:00:48 by elehtone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void	*fun_variable_string(t_lexer *lexer, char *cmd)
 	int	len;
 
 	len = 0;
-	while (cmd[len] != '\0' && cmd[len] != '"' && !fun_check_ifs(cmd[len]))
+	while (cmd[len] != '\0' && !fun_check_ifs(cmd[len]) && !fun_check_any_quote(cmd[len]))
 		len++;
 	cmd = fun_add_entry(lexer, cmd, len, TOKEN_VARIABLE);
 	lexer->vars++;
@@ -40,7 +40,7 @@ void	*fun_word_string(t_lexer *lexer, char *cmd)
 	int	len;
 
 	len = 0;
-	while (cmd[len] != '\0' && cmd[len] != '"' && !fun_check_ifs(cmd[len]))
+	while (cmd[len] != '\0' && !fun_check_ifs(cmd[len]) && !fun_check_any_quote(cmd[len]))
 		len++;
 	cmd = fun_add_entry(lexer, cmd, len, TOKEN_WORD);
 	return (cmd);

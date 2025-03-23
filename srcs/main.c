@@ -79,7 +79,6 @@ int parse_and_execute(char *line, t_mini *mini)
         mini->exit_status = ERROR;
         return (ERROR);
     }
-   //print_commands(mini);
     if (mini->num_commands > 0)
     {
         if (execute_commands(mini) == ERROR)

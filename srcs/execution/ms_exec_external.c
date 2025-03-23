@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ms_exec_external.c                                 :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/23 13:18:49 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/23 13:18:50 by mbyrne           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../../includes/minishell.h"
 
 static int	handle_command_not_found(t_mini *mini, int cmd_idx)
@@ -21,7 +9,7 @@ static int	handle_command_not_found(t_mini *mini, int cmd_idx)
 		ft_putendl_fd(": command not found", 2);
 	}
 	mini->exit_status = 127;
-	return (ERROR);
+	return (127);
 }
 
 static int	handle_execution_error(t_mini *mini, int cmd_idx)

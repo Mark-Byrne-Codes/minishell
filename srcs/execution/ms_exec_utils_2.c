@@ -70,6 +70,8 @@ int	execute_single_command(t_mini *mini, int i)
 {
 	int	status;
 
+	if (!mini->commands[i].args || !mini->commands[i].args[0])
+		return (SUCCESS);
 	if (mini->commands[i].is_builtin && mini->num_commands == 1)
 		status = execute_builtin(mini, i);
 	else

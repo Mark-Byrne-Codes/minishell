@@ -52,9 +52,9 @@ static int	process_redirection(t_mini *mini, t_command *cmd, t_redirection *r)
 		return (setup_input_redir_file(cmd, r->file));
 	else if (r->type == TOKEN_REDIR_OUT)
 		return (setup_output_redir_file(cmd, r->file, 0));
-	else if (r->type == TOKEN_REDIR_APPEND)
-		return (setup_output_redir_file(cmd, r->file, 1));
 	else if (r->type == TOKEN_HEREDOC)
+		return (setup_output_redir_file(cmd, r->file, 1));
+	else if (r->type == TOKEN_REDIR_APPEND)
 		return (setup_heredoc_delim(cmd, r->file));
 	return (SUCCESS);
 }

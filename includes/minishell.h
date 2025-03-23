@@ -131,6 +131,7 @@ void	update_env_variable(t_mini *mini, char *var_name, char *new_value);
 char	**env_list_to_array(t_env *head);
 void	free_env_list(t_env *head);
 char	*get_env_value(t_env *env, char *key);
+void	print_env_vars(t_env *env);
 
 // Memory Management & String Handling
 void	free_string_array(char **array);
@@ -214,9 +215,6 @@ char	*expand_tilde(t_mini *mini, char *str);
 void	free_token(t_token *token);
 
 // Token Handling
-int		ms_handle_pipe(t_mini *mini, t_list **temp, int *cmd_idx, int *arg_idx);
-int		ms_handle_token_expansion(t_mini *mini, t_command *cmd,
-			t_token *token, int *arg_idx);
 int		ms_handle_redirection(t_mini *mini, t_command *cmd, t_list **temp);
 int		ms_process_tokens(t_mini *mini, t_lexer *lexer);
 

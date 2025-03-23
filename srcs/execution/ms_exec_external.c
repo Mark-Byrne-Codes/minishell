@@ -14,11 +14,17 @@
 
 static int	handle_command_not_found(t_mini *mini, int cmd_idx)
 {
-	if (cmd_idx == 0)
+	// Only print error for the first command or when not in a pipeline
+	if (cmd_idx == 0 || mini->num_commands == 1)
 	{
 		ft_putstr_fd("minishell: ", 2);
 		ft_putstr_fd(mini->commands[cmd_idx].args[0], 2);
-		ft_putendl_fd(": command not found", 2);
+		
+		// Check if the command contains a slash (absolute or relative path)
+		if (ft_strchr(mini->commands[cmd_idx].args[0], '/'))
+			ft_putendl_fd(": No such file or directory", 2);
+		else
+			ft_putendl_fd(": command not found", 2);
 	}
 	mini->exit_status = 127;
 	return (127);
@@ -26,10 +32,22 @@ static int	handle_command_not_found(t_mini *mini, int cmd_idx)
 
 static int	handle_execution_error(t_mini *mini, int cmd_idx)
 {
+	struct stat file_stat;
+	
 	if (cmd_idx == 0)
 	{
-		ft_putstr_fd("minishell: ", 2);
-		perror(mini->commands[cmd_idx].args[0]);
+		if (stat(mini->commands[cmd_idx].args[0], &file_stat) == 0 && S_ISDIR(file_stat.st_mode))
+		{
+			ft_putstr_fd("minishell: ", 2);
+			ft_putstr_fd(mini->commands[cmd_idx].args[0], 2);
+			ft_putendl_fd(": Is a directory", 2);
+			exit(126);
+		}
+		else
+		{
+			ft_putstr_fd("minishell: ", 2);
+			perror(mini->commands[cmd_idx].args[0]);
+		}
 	}
 	if (errno == ENOENT)
 		exit(127);
@@ -84,7 +102,8 @@ int	launch_external(t_mini *mini, int cmd_idx)
 	int		result;
 
 	if (!mini->commands[cmd_idx].args || !mini->commands[cmd_idx].args[0])
-		return (ERROR);
+		return (SUCCESS);
+		
 	if (mini->commands[cmd_idx].is_builtin)
 		return (execute_child_process(mini, cmd_idx, NULL));
 	cmd_path = get_command_path(mini->commands[cmd_idx].args[0], mini->env);

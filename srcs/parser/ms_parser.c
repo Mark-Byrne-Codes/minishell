@@ -30,8 +30,26 @@ static int	handle_redirection_parse(t_mini *mini, t_command *cmd, t_list **temp)
 static int	handle_word_or_variable(t_mini *mini, t_command *cmd, 
 		t_token *data, int *arg_idx)
 {
-	if (ms_handle_token_expansion(mini, cmd, data, arg_idx) == ERROR)
+	char *expanded;
+	
+	expanded = expand_token(mini, data);
+	if (!expanded)
 		return (ERROR);
+	
+	// Skip empty arguments at the beginning of a command
+	if (expanded[0] != '\0' || *arg_idx > 0)
+	{
+		if (add_argument(cmd, expanded, *arg_idx) == ERROR)
+		{
+			free(expanded);
+			return (ERROR);
+		}
+		if (*arg_idx == 0 && data->token == TOKEN_WORD && is_builtin(expanded))
+			cmd->is_builtin = 1;
+		(*arg_idx)++;
+	}
+	
+	free(expanded);
 	return (SUCCESS);
 }
 
@@ -42,30 +60,31 @@ static int	handle_ifs(t_list **temp)
 }
 
 static int	process_token(t_mini *mini, t_token *data, t_list **temp, 
-		int *cmd_idx, int *arg_idx)
+	int *cmd_idx, int *arg_idx)
 {
-	if (data->token == TOKEN_PIPE)
-	{
-		if (handle_pipe(temp, cmd_idx, arg_idx) == ERROR)
-			return (ERROR);
-	}
-	else if (data->token >= TOKEN_REDIR_IN && data->token <= TOKEN_HEREDOC)
-	{
-		if (handle_redirection_parse(mini, &mini->commands[*cmd_idx], temp) == ERROR)
-			return (ERROR);
-	}
-	else if (data->token == TOKEN_WORD || data->token == TOKEN_VARIABLE)
-	{
-		if (handle_word_or_variable(mini, &mini->commands[*cmd_idx], 
-				data, arg_idx) == ERROR)
-			return (ERROR);
-	}
-	else if (data->token == TOKEN_IFS)
-	{
-		if (handle_ifs(temp) == ERROR)
-			return (ERROR);
-	}
-	return (SUCCESS);
+if (data->token == TOKEN_PIPE)
+{
+	if (handle_pipe(temp, cmd_idx, arg_idx) == ERROR)
+		return (ERROR);
+}
+else if (data->token >= TOKEN_REDIR_IN && data->token <= TOKEN_HEREDOC)
+{
+	if (handle_redirection_parse(mini, &mini->commands[*cmd_idx], temp) == ERROR)
+		return (ERROR);
+}
+else if (data->token == TOKEN_WORD || data->token == TOKEN_VARIABLE || 
+		 data->token == TOKEN_SINGLE_Q_STRING)
+{
+	if (handle_word_or_variable(mini, &mini->commands[*cmd_idx], 
+			data, arg_idx) == ERROR)
+		return (ERROR);
+}
+else if (data->token == TOKEN_IFS)
+{
+	if (handle_ifs(temp) == ERROR)
+		return (ERROR);
+}
+return (SUCCESS);
 }
 
 int	ms_process_tokens(t_mini *mini, t_lexer *lexer)

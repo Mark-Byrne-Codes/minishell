@@ -62,44 +62,42 @@ char	*join_and_free(char *s1, char *s2)
 	return (result);
 }
 
-
-void print_commands(t_mini *mini)
-{
-    int i = 0;
-    int j;
-    
-    printf("\n==== COMMAND DETAILS ====\n");
-    while (i < mini->num_commands)
-    {
-        printf("Command %d:\n", i + 1);
-        j = 0;
-        printf("  Arguments:\n");
-        if (mini->commands[i].args != NULL)
-        {
-            while (mini->commands[i].args[j] != NULL)
-            {
-                printf("    Arg[%d]: %s\n", j, mini->commands[i].args[j]);
-                j++;
-            }
-        }
-        else
-        {
-            printf("    No arguments\n");
-        }
-        printf("  File descriptors:\n");
-        printf("    fd_in: %d\n", mini->commands[i].fd_in);
-        printf("    fd_out: %d\n", mini->commands[i].fd_out);
-        printf("    pipe_read: %d\n", mini->commands[i].pipe_read);
-        printf("    pipe_write: %d\n", mini->commands[i].pipe_write);
-        printf("  Flags:\n");
-        printf("    is_builtin: %d\n", mini->commands[i].is_builtin);
-        printf("    has_input_redir: %d\n", mini->commands[i].has_input_redir);
-        printf("    has_output_redir: %d\n", mini->commands[i].has_output_redir);
-        printf("    append: %d\n", mini->commands[i].append);
-        printf("    is_heredoc: %d\n", mini->commands[i].is_heredoc);
-        printf("    exit_status: %d\n", mini->commands[i].exit_status);
-        printf("\n");
-        i++;
-    }
-    printf("========================\n\n");
-}
+// void print_commands(t_mini *mini)
+// {
+//     int i = 0;
+//     int j;
+//     printf("\n==== COMMAND DETAILS ====\n");
+//     while (i < mini->num_commands)
+//     {
+//         printf("Command %d:\n", i + 1);
+//         j = 0;
+//         printf("  Arguments:\n");
+//         if (mini->commands[i].args != NULL)
+//         {
+//             while (mini->commands[i].args[j] != NULL)
+//             {
+//                 printf("    Arg[%d]: %s\n", j, mini->commands[i].args[j]);
+//                 j++;
+//             }
+//         }
+//         else
+//         {
+//             printf("    No arguments\n");
+//         }
+//         printf("  File descriptors:\n");
+//         printf("    fd_in: %d\n", mini->commands[i].fd_in);
+//         printf("    fd_out: %d\n", mini->commands[i].fd_out);
+//         printf("    pipe_read: %d\n", mini->commands[i].pipe_read);
+//         printf("    pipe_write: %d\n", mini->commands[i].pipe_write);
+//         printf("  Flags:\n");
+//         printf("    is_builtin: %d\n", mini->commands[i].is_builtin);
+//         printf("    has_input_redir: %d\n", mini->commands[i].has_input_redir);
+//         printf("    has_output_redir: %d\n", mini->commands[i].has_output_redir);
+//         printf("    append: %d\n", mini->commands[i].append);
+//         printf("    is_heredoc: %d\n", mini->commands[i].is_heredoc);
+//         printf("    exit_status: %d\n", mini->commands[i].exit_status);
+//         printf("\n");
+//         i++;
+//     }
+//     printf("========================\n\n");
+// }

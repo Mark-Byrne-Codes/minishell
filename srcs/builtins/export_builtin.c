@@ -12,18 +12,6 @@
 
 #include "../../includes/minishell.h"
 
-static void	print_env_vars(t_env *env)
-{
-	while (env)
-	{
-		ft_printf("declare -x %s", env->name);
-		if (env->value)
-			ft_printf("=\"%s\"", env->value);
-		ft_printf("\n");
-		env = env->next;
-	}
-}
-
 static int	is_valid_identifier(const char *name)
 {
 	if (!name || !*name)
@@ -88,10 +76,29 @@ static int	set_env_var_internal(t_mini *mini, const char *arg)
 	return (0);
 }
 
+static int	handle_split_arg(t_mini *mini, char **args, int *i, int *ret)
+{
+	char	*full_arg;
+	char	*temp;
+
+	full_arg = ft_strjoin3(args[*i], "\"", args[*i + 1]);
+	if (!full_arg)
+		return (ERROR);
+	temp = ft_strjoin(full_arg, "\"");
+	free(full_arg);
+	if (!temp)
+		return (ERROR);
+	if (set_env_var_internal(mini, temp) != 0)
+		*ret = 1;
+	free(temp);
+	*i += 2;
+	return (SUCCESS);
+}
+
 int	export_builtin(t_mini *mini, char **args)
 {
-	int	i;
-	int	ret;
+	int		i;
+	int		ret;
 
 	if (!args[1])
 	{
@@ -102,9 +109,17 @@ int	export_builtin(t_mini *mini, char **args)
 	ret = 0;
 	while (args[i])
 	{
-		if (set_env_var_internal(mini, args[i]) != 0)
-			ret = 1;
-		i++;
+		if (args[i][ft_strlen(args[i]) - 1] == '=' && args[i + 1])
+		{
+			if (handle_split_arg(mini, args, &i, &ret) == ERROR)
+				return (ERROR);
+		}
+		else
+		{
+			if (set_env_var_internal(mini, args[i]) != 0)
+				ret = 1;
+			i++;
+		}
 	}
 	return (ret);
 }

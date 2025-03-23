@@ -14,75 +14,56 @@
 
 static int	is_numeric(const char *str)
 {
-	const char	*start;
+	int	i;
+	int	has_digits;
 
 	if (!str || !*str)
 		return (0);
-	if (*str == '+' || *str == '-')
-		str++;
-	if (*str == '"' || *str == '\'')
-		str++;
-	if (!*str)
-		return (0);
-	start = str;
-	while (*str)
+	i = 0;
+	has_digits = 0;
+	if (str[i] == '+' || str[i] == '-')
+		i++;
+	if (str[i] == '"' || str[i] == '\'')
+		i++;
+	while (str[i] && ft_isdigit(str[i]))
 	{
-		if (*str == '"' || *str == '\'')
-		{
-			if (str != start && *(str + 1) == '\0')
-				break ;
-			else
-				return (0);
-		}
-		if (!ft_isdigit(*str))
-			return (0);
-		str++;
+		has_digits = 1;
+		i++;
 	}
-	return (1);
+	if (str[i] && (str[i] == '"' || str[i] == '\''))
+		i++;
+	return (str[i] == '\0' && has_digits);
 }
 
-static int	pro_digit(long long *result, int sign, char digit, int *overflow)
-{
-	long long	temp_result;
-
-	temp_result = *result * 10 + (digit - '0');
-	if ((temp_result > LLONG_MAX / 10) || (temp_result < LLONG_MIN / 10)
-		|| (sign == 1 && temp_result > LLONG_MAX - (digit - '0'))
-		|| (sign == -1 && temp_result < LLONG_MIN + (digit - '0')))
-	{
-		*overflow = 1;
-		return (1);
-	}
-	*result = temp_result;
-	return (0);
-}
-
-static long long	ft_atoll_with_overflow(const char *str, int *overflow)
+static long long	convert_to_number(const char *str, int *overflow)
 {
 	long long	result;
 	int			sign;
+	int			i;
 
 	result = 0;
 	sign = 1;
 	*overflow = 0;
-	if (*str == '+' || *str == '-')
+	i = 0;
+	if (str[i] == '+' || str[i] == '-')
 	{
-		if (*str == '-')
+		if (str[i] == '-')
 			sign = -1;
-		else
-			sign = 1;
-		str++;
+		i++;
 	}
-	if (*str == '"' || *str == '\'')
-		str++;
-	while (ft_isdigit(*str) && !pro_digit(&result, sign, *str, overflow))
-		str++;
-	if (*str == '"' || *str == '\'')
-		str++;
+	if (str[i] == '"' || str[i] == '\'')
+		i++;
+	while (str[i] && ft_isdigit(str[i]) && !*overflow)
+	{
+		if ((result > LLONG_MAX / 10) || (sign == 1 && \
+			result * 10 > LLONG_MAX - (str[i] - '0')))
+			*overflow = 1;
+		result = result * 10 + (str[i++] - '0');
+	}
 	return (result * sign);
 }
 
-static void	handle_invalid_argument(t_mini *mini, char *arg)
+static void	handle_invalid_arg(t_mini *mini, char *arg)
 {
 	ft_putstr_fd("minishell: exit: ", STDERR_FILENO);
 	ft_putstr_fd(arg, STDERR_FILENO);
@@ -91,23 +72,20 @@ static void	handle_invalid_argument(t_mini *mini, char *arg)
 	clean_exit(mini);
 }
 
-int	exit_builtin(t_mini *mini, char **args)
+static int	handle_sign_and_number(t_mini *mini, char **args, int arg_count)
 {
-	int			arg_count;
-	int			overflow;
+	char		*num_str;
 	long long	exit_code;
+	int			overflow;
 
-	arg_count = 0;
-	while (args[arg_count])
-		arg_count++;
-	if (arg_count == 1)
-		clean_exit(mini);
-	if (!is_numeric(args[1]))
-		handle_invalid_argument(mini, args[1]);
-	exit_code = ft_atoll_with_overflow(args[1], &overflow);
+	num_str = ft_strjoin(args[1], args[2]);
+	if (!num_str)
+		return (ERROR);
+	exit_code = convert_to_number(num_str, &overflow);
+	free(num_str);
 	if (overflow)
-		handle_invalid_argument(mini, args[1]);
-	if (arg_count > 2)
+		handle_invalid_arg(mini, args[2]);
+	if (arg_count > 3)
 	{
 		ft_putstr_fd("minishell: exit: too many arguments\n", STDERR_FILENO);
 		mini->exit_status = 1;
@@ -116,4 +94,33 @@ int	exit_builtin(t_mini *mini, char **args)
 	mini->exit_status = (unsigned char)exit_code;
 	clean_exit(mini);
 	return (0);
+}
+
+int	exit_builtin(t_mini *mini, char **args)
+{
+	int			arg_count;
+	long long	exit_code;
+	int			overflow;
+
+	arg_count = 0;
+	while (args[arg_count])
+		arg_count++;
+	if (arg_count == 1)
+		clean_exit(mini);
+	if (arg_count >= 3 && (ft_strcmp(args[1], "+") == 0
+			|| ft_strcmp(args[1], "-") == 0) && is_numeric(args[2]))
+		return (handle_sign_and_number(mini, args, arg_count));
+	if (!is_numeric(args[1]))
+		handle_invalid_arg(mini, args[1]);
+	exit_code = convert_to_number(args[1], &overflow);
+	if (overflow)
+		handle_invalid_arg(mini, args[1]);
+	if (arg_count > 2)
+	{
+		ft_putstr_fd("minishell: exit: too many arguments\n", STDERR_FILENO);
+		mini->exit_status = 1;
+		return (1);
+	}
+	mini->exit_status = (unsigned char)exit_code;
+	return (clean_exit(mini), 0);
 }

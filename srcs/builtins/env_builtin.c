@@ -30,3 +30,15 @@ int	env_builtin(t_mini *mini)
 	}
 	return (0);
 }
+
+void	print_env_vars(t_env *env)
+{
+	while (env)
+	{
+		ft_printf("declare -x %s", env->name);
+		if (env->value)
+			ft_printf("=\"%s\"", env->value);
+		ft_printf("\n");
+		env = env->next;
+	}
+}

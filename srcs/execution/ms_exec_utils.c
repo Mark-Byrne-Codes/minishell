@@ -77,9 +77,33 @@ char	*get_command_path(char *cmd, t_env *env)
 	char	*path;
 	char	**dirs;
 	int		i;
+	struct stat file_stat;
 
+	if (access(cmd, F_OK) == 0 && !ft_strchr(cmd, '/'))
+	{
+		if (stat(cmd, &file_stat) == 0 && S_ISREG(file_stat.st_mode))
+		{
+			if (access(cmd, X_OK) != 0)
+			{
+				errno = EACCES;
+				return (ft_strdup(cmd));
+			}
+		}
+	}
 	if (ft_strchr(cmd, '/'))
-		return (cmd);
+	{
+		if (access(cmd, F_OK) == 0)
+		{
+			if (stat(cmd, &file_stat) == 0 && S_ISREG(file_stat.st_mode))
+			{
+				if (access(cmd, X_OK) == 0)
+					return (cmd);
+				return (cmd);
+			}
+			return (cmd);
+		}
+		return (NULL);
+	}
 	path = get_env_value(env, "PATH");
 	dirs = ft_split(path, ':');
 	i = -1;
@@ -119,8 +143,12 @@ int	wait_for_children(t_mini *mini, int last_status)
 		}
 		pid = waitpid(-1, &status, WUNTRACED);
 	}
+	if (mini->num_commands > 1)
+		return (mini->exit_status);
 	if (last_status != ERROR)
 		return (last_exit_status);
 	mini->exit_status = last_status;
-	return (mini->exit_status);
+	return (mini->exit_status = last_status);
 }
+
+

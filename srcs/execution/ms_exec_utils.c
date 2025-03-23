@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ms_exec_utils.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/03/23 14:55:17 by mbyrne            #+#    #+#             */
+/*   Updated: 2025/03/23 15:02:21 by mbyrne           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/minishell.h"
 
 int	add_argument(t_command *cmd, char *arg, int arg_idx)
@@ -60,7 +72,7 @@ int	init_commands(t_mini *mini, int num_commands)
 	return (SUCCESS);
 }
 
-char *get_command_path(char *cmd, t_env *env)
+char	*get_command_path(char *cmd, t_env *env)
 {
 	char	*path;
 	char	**dirs;

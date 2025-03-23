@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/18 15:30:12 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/23 14:01:15 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/23 15:00:46 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,6 @@
 static int	handle_heredoc_input(t_command *cmd, char *delim, int pipe_fd[2]);
 static int	process_heredoc_line(t_command *cmd, char *line, int pipe_fd[2]);
 
-/**
- * Sets up a heredoc with the specified delimiter
- * Creates a pipe and reads input until the delimiter is encountered
- */
 int	setup_heredoc_delim(t_command *cmd, char *delim)
 {
 	int		pipe_fd[2];
@@ -45,10 +41,6 @@ int	setup_heredoc_delim(t_command *cmd, char *delim)
 	return (SUCCESS);
 }
 
-/**
- * Reads input lines until the delimiter is encountered
- * Writes each line to the pipe
- */
 static int	handle_heredoc_input(t_command *cmd, char *delim, int pipe_fd[2])
 {
 	char	*line;
@@ -78,10 +70,6 @@ static int	handle_heredoc_input(t_command *cmd, char *delim, int pipe_fd[2])
 	return (SUCCESS);
 }
 
-/**
- * Processes a single line of heredoc input
- * Expands variables and writes to the pipe
- */
 static int	process_heredoc_line(t_command *cmd, char *line, int pipe_fd[2])
 {
 	char	*expanded_line;
@@ -100,32 +88,30 @@ static int	process_heredoc_line(t_command *cmd, char *line, int pipe_fd[2])
 	return (SUCCESS);
 }
 
-char *remove_quotes(const char *str)
+char	*remove_quotes(const char *str)
 {
-    int i;
-    int j;
-    int len;
-    char *result;
-    int in_quote[2];
+	int		i;
+	int		j;
+	char	*result;
+	int		in_quote[2];
 
-    len = ft_strlen(str);
-    result = malloc(len + 1);
-    if (!result)
-        return (NULL);
-    i = 0;
-    j = 0;
-    in_quote[0] = 0;
-    in_quote[1] = 0;
-    while (str[i])
-    {
-        if (str[i] == '\'' && !in_quote[1])
-            in_quote[0] = !in_quote[0];
-        else if (str[i] == '"' && !in_quote[0])
-            in_quote[1] = !in_quote[1];
-        else
-            result[j++] = str[i];
-        i++;
-    }
-    result[j] = '\0';
-    return (result);
+	result = malloc(ft_strlen(str) + 1);
+	if (!result)
+		return (NULL);
+	i = 0;
+	j = 0;
+	in_quote[0] = 0;
+	in_quote[1] = 0;
+	while (str[i])
+	{
+		if (str[i] == '\'' && !in_quote[1])
+			in_quote[0] = !in_quote[0];
+		else if (str[i] == '"' && !in_quote[0])
+			in_quote[1] = !in_quote[1];
+		else
+			result[j++] = str[i];
+		i++;
+	}
+	result[j] = '\0';
+	return (result);
 }

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ms_exec_external.c                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/03/23 14:55:49 by mbyrne            #+#    #+#             */
+/*   Updated: 2025/03/23 15:01:15 by mbyrne           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/minishell.h"
 
 static int	handle_command_not_found(t_mini *mini, int cmd_idx)
@@ -31,8 +43,8 @@ static void	close_other_pipes(t_mini *mini, int cmd_idx)
 	i = 0;
 	while (i < mini->num_commands)
 	{
-		if (i != cmd_idx && (mini->commands[i].pipe_read != -1 
-			|| mini->commands[i].pipe_write != -1))
+		if (i != cmd_idx && (mini->commands[i].pipe_read != -1
+				|| mini->commands[i].pipe_write != -1))
 		{
 			if (mini->commands[i].pipe_read != -1)
 				close(mini->commands[i].pipe_read);

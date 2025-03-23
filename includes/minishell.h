@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   minishell.h                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/03 15:33:52 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/23 13:42:03 by mbyrne           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
@@ -123,7 +112,6 @@ typedef struct s_mini
 	int			is_builtin;
 }	t_mini;
 
-// Environment Variable Handling
 t_env   *copy_env(char **envp);
 t_env   *create_env_node(char *name, char *value);
 void    add_env_node(t_env **head, t_env *new_node);
@@ -196,24 +184,31 @@ char    *expand_exit_status(t_mini *mini);
 char    *expand_env_var(t_mini *mini, const char *var_name);
 
 //ms_lexer.c - stuff to lex, count special characters and so on
+void	*fun_charwise(t_lexer *lexer, char *command);
 int	parse_line(t_lexer *lexer, char *command, t_mini *mini);
+
+//ms_lexer_tokens.c - functions to handle assigning tokens
 void	*fun_variable_string(t_lexer *lexer, char *cmd);
 void	*fun_word_string(t_lexer *lexer, char *cmd);
 void	*fun_double_quote_string(t_lexer *lexer, char *command);
 void	*fun_single_quote_string(t_lexer *lexer, char *command);
 
-//ms_lexer_utilities.c - stuff to lex, count special characters and so on
-void	*fun_add_entry(t_lexer *lexer, char *str, int len, t_token_type token);
+//ms_lexer_utils.c - helpers for the lexer, list handling
 void	fun_lex_struct_init(t_lexer *lexer);
+void	*fun_add_entry(t_lexer *lexer, char *str, int len, t_token_type token);
 void	fun_flag_flipper(int *flag);
 int	fun_check_ifs(unsigned int c);
-void    free_token(t_token *token);
 void	unfun_add_entry_fail(t_lexer *lexer, int end);
+
+//ms_lexer_utils2.c - helpers for the lexer, list handling
+int	fun_check_any_quote(unsigned int c);
 
 
 char    *expand_token(t_mini *mini, t_token *token);
 char    *expand_variables(t_mini *mini, char *str, int in_quotes);
 char    *expand_tilde(t_mini *mini, char *str);
+
+void    free_token(t_token *token);
 
 int	ms_handle_pipe(t_mini *mini, t_list **temp, int *cmd_idx, int *arg_idx);
 int	ms_handle_token_expansion(t_mini *mini, t_command *cmd, 

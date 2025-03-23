@@ -1,14 +1,3 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2025/03/03 15:33:31 by mbyrne            #+#    #+#              #
-#    Updated: 2025/03/23 13:27:46 by mbyrne           ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
 
 NAME = minishell
 
@@ -60,6 +49,7 @@ SRCS_EXEC = srcs/utils/signals.c \
 				srcs/execution/ms_exec_heredoc.c
  
 SRCS_PARSE = srcs/parser/ms_lexer_utils.c \
+					srcs/parser/ms_lexer_utils2.c \
 					srcs/parser/ms_lexer.c \
 					srcs/parser/ms_lexer_tokens.c \
 					srcs/parser/ms_expand.c \

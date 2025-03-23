@@ -16,12 +16,12 @@ static void	*fun_less_greater(t_lexer *lex, char *cmd)
 {
 	if (*cmd == '<' && *(cmd + 1) == '<' && !lex->squote && !lex->dquote)
 	{
-		cmd = fun_add_entry(lex, cmd, 2, TOKEN_HEREDOC);
+		cmd = fun_add_entry(lex, cmd, 2, TOKEN_REDIR_APPEND);
 		lex->red_delim++;
 	}
 	else if (*cmd == '>' && *(cmd + 1) == '>' && !lex->squote && !lex->dquote)
 	{
-		cmd = fun_add_entry(lex, cmd, 2, TOKEN_REDIR_APPEND);
+		cmd = fun_add_entry(lex, cmd, 2, TOKEN_HEREDOC);
 		lex->red_append++;
 	}
 	else if (*cmd == '<' && !lex->squote && !lex->dquote)
@@ -40,11 +40,11 @@ static void	*fun_less_greater(t_lexer *lex, char *cmd)
 }
 
 /*
- * Fill a linked list with each individual distinct part of the command.
- * $IFS is usually space, tab, new line. Not sure if I should drag it from envp.
+ * Check the current character and act appropriately.
  * Params: *lexer, *command
+ * Return: current location in *command
  */
-static void	fun_fill_dictionary(t_lexer *lexer, char *command)
+void	*fun_charwise(t_lexer *lexer, char *command)
 {
 	while (*command)
 	{
@@ -69,6 +69,20 @@ static void	fun_fill_dictionary(t_lexer *lexer, char *command)
 		}
 		else
 			command = fun_word_string(lexer, command);
+	}
+	return (command);
+}
+
+/*
+ * Fill a linked list with each individual distinct part of the command.
+ * $IFS is usually space, tab, new line. Not sure if I should drag it from envp.
+ * Params: *lexer, *command
+ */
+static void	fun_fill_dictionary(t_lexer *lexer, char *command)
+{
+	while (*command)
+	{
+		command = fun_charwise(lexer, command);
 	}
 }
 

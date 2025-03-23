@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/03/23 15:39:26 by mbyrne            #+#    #+#             */
+/*   Updated: 2025/03/23 15:39:27 by mbyrne           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 # include "../includes/minishell.h"
 
 
@@ -22,52 +34,8 @@ static int	init_mini(t_mini *mini, int argc, char **argv, char **envp)
 	return (0);
 }
 
-void print_commands(t_mini *mini)
+int parse_and_execute(char *line, t_mini *mini, t_lexer *lex_data)
 {
-    int i = 0;
-    int j;
-    
-    printf("\n==== COMMAND DETAILS ====\n");
-    while (i < mini->num_commands)
-    {
-        printf("Command %d:\n", i + 1);
-        j = 0;
-        printf("  Arguments:\n");
-        if (mini->commands[i].args != NULL)
-        {
-            while (mini->commands[i].args[j] != NULL)
-            {
-                printf("    Arg[%d]: %s\n", j, mini->commands[i].args[j]);
-                j++;
-            }
-        }
-        else
-        {
-            printf("    No arguments\n");
-        }
-        printf("  File descriptors:\n");
-        printf("    fd_in: %d\n", mini->commands[i].fd_in);
-        printf("    fd_out: %d\n", mini->commands[i].fd_out);
-        printf("    pipe_read: %d\n", mini->commands[i].pipe_read);
-        printf("    pipe_write: %d\n", mini->commands[i].pipe_write);
-        printf("  Flags:\n");
-        printf("    is_builtin: %d\n", mini->commands[i].is_builtin);
-        printf("    has_input_redir: %d\n", mini->commands[i].has_input_redir);
-        printf("    has_output_redir: %d\n", mini->commands[i].has_output_redir);
-        printf("    append: %d\n", mini->commands[i].append);
-        printf("    is_heredoc: %d\n", mini->commands[i].is_heredoc);
-        printf("    exit_status: %d\n", mini->commands[i].exit_status);
-        printf("\n");
-        i++;
-    }
-    printf("========================\n\n");
-}
-
-int parse_and_execute(char *line, t_mini *mini)
-{
-    t_lexer *lex_data;
-
-    lex_data = ft_calloc(1, sizeof(t_lexer));
     if (!lex_data)
     {
         mini->exit_status = ERROR;
@@ -79,16 +47,13 @@ int parse_and_execute(char *line, t_mini *mini)
         mini->exit_status = ERROR;
         return (ERROR);
     }
-    if (mini->num_commands > 0)
+    if (mini->num_commands > 0 && execute_commands(mini) == ERROR)
     {
-        if (execute_commands(mini) == ERROR)
-        {
-            free_commands(mini);
-            free_tokens(mini);
-            free(lex_data);
-            mini->exit_status = ERROR;
-            return (ERROR);
-        }
+        free_commands(mini);
+        free_tokens(mini);
+        free(lex_data);
+        mini->exit_status = ERROR;
+        return (ERROR);
     }
     free_commands(mini);
     free_tokens(mini);
@@ -96,10 +61,29 @@ int parse_and_execute(char *line, t_mini *mini)
     return (SUCCESS);
 }
 
+void process_input_line(char *line, t_mini *mini)
+{
+    t_lexer *lex_data;
+
+    lex_data = ft_calloc(1, sizeof(t_lexer));
+    if (*line == '\0')
+    {
+        free(line);
+        return;
+    }
+    add_history(line);
+    if (parse_and_execute(line, mini, lex_data) == ERROR)
+    {
+        free(line);
+        return;
+    }
+    free(line);
+}
+
 void main_loop(t_mini *mini)
 {
-    char    *line;
-    char    *prompt;
+    char *line;
+    char *prompt;
 
     while (!mini->should_exit)
     {
@@ -111,28 +95,19 @@ void main_loop(t_mini *mini)
             ft_putendl_fd("exit", STDOUT_FILENO);
             break;
         }
-        if (*line == '\0')
-        {
-            free(line);
-            continue;
-        }
-        add_history(line);
-        if (parse_and_execute(line, mini) == ERROR)
-            continue;
-        free(line);
+        process_input_line(line, mini);
     }
 }
 
-
-int	main(int argc, char **argv, char **envp)
+int main(int argc, char **argv, char **envp)
 {
-	t_mini	mini;
+    t_mini mini;
 
     ft_memset(&mini, 0, sizeof(t_mini));
-	if (init_mini(&mini, argc, argv, envp) != 0)
-		return (1);
-	main_loop(&mini);
-	rl_clear_history();
+    if (init_mini(&mini, argc, argv, envp) != 0)
+        return (1);
+    main_loop(&mini);
+    rl_clear_history();
     clean_exit(&mini);
-	return (mini.exit_status);
+    return (mini.exit_status);
 }

@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:59:13 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/21 17:11:15 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/23 13:32:42 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,16 +51,30 @@ static int	handle_variable_expansion(t_mini *mini, char *str, char **res, int i)
 	return (i + advance);
 }
 
-static int	append_char(char **result, char c)
+static int append_char(char **result, char c)
 {
-	char	*temp;
+    char *temp;
+    size_t result_len;
+    char *new_result;
 
-	temp = *result;
-	*result = ft_strjoinchar(*result, c);
-	free(temp);
-	if (!*result)
-		return (0);
-	return (1);
+    temp = *result;
+    result_len = 0;
+    if (temp)
+        result_len = ft_strlen(temp);
+    new_result = malloc(result_len + 2);
+    if (!new_result)
+    {
+        free(temp);
+        *result = NULL;
+        return (0);
+    }
+    if (temp)
+        ft_memcpy(new_result, temp, result_len);
+    new_result[result_len] = c;
+    new_result[result_len + 1] = '\0';
+    *result = new_result;
+    free(temp);
+    return (1);
 }
 
 char	*expand_variables(t_mini *mini, char *str, int in_quotes)

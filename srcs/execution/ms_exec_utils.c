@@ -40,8 +40,6 @@ static void	init_command(t_command *cmd, t_mini *mini)
 	cmd->append = 0;
 	cmd->is_heredoc = 0;
 	cmd->mini = mini;
-	cmd->redir_type = 0;
-	cmd->redir_file = NULL;
 	cmd->error = 0;
 }
 

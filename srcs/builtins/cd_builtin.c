@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 09:17:19 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/21 13:20:45 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/23 12:03:57 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,30 +75,29 @@ static int	change_directory(t_mini *mini, char *path)
 	return (0);
 }
 
-int cd_builtin(t_mini *mini, char **args)
+int	cd_builtin(t_mini *mini, char **args)
 {
-    char *path;
-    int arg_count;
+	char	*path;
+	int		arg_count;
 
-    arg_count = 0;
-    while (args[arg_count])
-        arg_count++;
-
-    if (arg_count > 2)
-    {
-        ft_putstr_fd("minishell: cd: too many arguments\n", STDERR_FILENO);
-        return (1);
-    }
-    if (arg_count == 1)
-    {
-        path = getenv("HOME");
-        if (!path)
-        {
-            ft_putstr_fd("minishell: cd: HOME not set\n", STDERR_FILENO);
-            return (1);
-        }
-    }
-    else
-        path = args[1];
-    return (change_directory(mini, path));
+	arg_count = 0;
+	while (args[arg_count])
+		arg_count++;
+	if (arg_count > 2)
+	{
+		ft_putstr_fd("minishell: cd: too many arguments\n", STDERR_FILENO);
+		return (1);
+	}
+	if (arg_count == 1)
+	{
+		path = getenv("HOME");
+		if (!path)
+		{
+			ft_putstr_fd("minishell: cd: HOME not set\n", STDERR_FILENO);
+			return (1);
+		}
+	}
+	else
+		path = args[1];
+	return (change_directory(mini, path));
 }

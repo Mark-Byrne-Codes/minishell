@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:54:23 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/21 09:55:29 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/23 13:22:46 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ char	*get_var_name(const char *str)
 		i++;
 	if (i == 0)
 		return (NULL);
-	name = ft_strndup(str, i);
+	name = ft_strdup(str);
 	return (name);
 }
 

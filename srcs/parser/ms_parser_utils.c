@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parser_utils.c                                     :+:      :+:    :+:   */
+/*   ms_parser_utils.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/18 17:30:12 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/18 17:30:12 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/23 13:15:27 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
  * Creates a new redirection node
  * Returns the node or NULL on failure
  */
-static t_redirection	*create_redirection(t_token *type, t_token *file)
+t_redirection	*create_redirection(t_token *type, t_token *file)
 {
 	t_redirection	*new_redir;
 
@@ -38,7 +38,7 @@ static t_redirection	*create_redirection(t_token *type, t_token *file)
  * Adds a redirection to a command
  * Returns SUCCESS or ERROR
  */
-static int	add_redirection(t_command *cmd, t_redirection *new_redir)
+int	add_redirection(t_command *cmd, t_redirection *new_redir)
 {
 	t_redirection	*redir_list;
 
@@ -84,49 +84,3 @@ int	ms_handle_redirection(t_mini *mini, t_command *cmd, t_list **temp)
 	*temp = (*temp)->next;
 	return (SUCCESS);
 }
-
-/**
- * Processes tokens from the lexer
- * Builds command structures based on tokens
- */
-int	ms_process_tokens(t_mini *mini, t_lexer *lexer)
-{
-	t_list	*temp;
-	t_token	*data;
-	int		cmd_idx;
-	int		arg_idx;
-
-	temp = lexer->dictionary;
-	cmd_idx = 0;
-	arg_idx = 0;
-	while (temp)
-	{
-		data = (t_token *)temp->content;
-		if (data->token == TOKEN_PIPE)
-		{
-			if (ms_handle_pipe(mini, &temp, &cmd_idx, &arg_idx) == ERROR)
-				return (ERROR);
-			continue;
-		}
-		if (data->token >= TOKEN_REDIR_IN && data->token <= TOKEN_HEREDOC)
-		{
-			if (ms_handle_redirection(mini, &mini->commands[cmd_idx], &temp) == ERROR)
-				return (ERROR);
-			continue;
-		}
-		if (data->token == TOKEN_WORD || data->token == TOKEN_VARIABLE)
-		{
-			if (ms_handle_token_expansion(mini, &mini->commands[cmd_idx], 
-					data, &arg_idx) == ERROR)
-				return (ERROR);
-		}
-		else if (data->token == TOKEN_IFS)
-		{
-			temp = temp->next;
-			continue;
-		}
-		temp = temp->next;
-	}
-	return (SUCCESS);
-}
-

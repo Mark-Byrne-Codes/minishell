@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   exec_cmd.c                                         :+:      :+:    :+:   */
+/*   ms_exec_cmds.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/12 11:16:34 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/18 11:00:15 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/21 10:00:24 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,6 @@ static int	prepare_command(t_mini *mini, int i,
 	}
 	if (handle_pipe_setup(mini, i) == ERROR)
 		return (ERROR);
-	
 	if (mini->commands[i].redirections)
 	{
 		if (handle_redirection(mini, &mini->commands[i]) == ERROR

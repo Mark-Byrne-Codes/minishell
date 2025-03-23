@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ms_exec_utils_2.c                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/03/21 13:00:40 by mbyrne            #+#    #+#             */
+/*   Updated: 2025/03/21 13:00:41 by mbyrne           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/minishell.h"
 
 static int	handle_file_open_error(t_command *cmd, char *filename)
@@ -71,4 +83,24 @@ int	execute_single_command(t_mini *mini, int i)
 	else
 		status = launch_external(mini, i);
 	return (status);
+}
+
+/**
+ * Checks if a string contains only digits
+ * Returns 1 if true, 0 if false
+ */
+int	ft_is_numeric(char *str)
+{
+	int	i;
+
+	i = 0;
+	if (str[i] == '-' || str[i] == '+')
+		i++;
+	while (str[i])
+	{
+		if (!ft_isdigit(str[i]))
+			return (0);
+		i++;
+	}
+	return (1);
 }

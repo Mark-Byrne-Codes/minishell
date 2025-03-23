@@ -31,8 +31,6 @@ void print_commands(t_mini *mini)
     while (i < mini->num_commands)
     {
         printf("Command %d:\n", i + 1);
-        
-        // Print arguments
         j = 0;
         printf("  Arguments:\n");
         if (mini->commands[i].args != NULL)
@@ -47,15 +45,11 @@ void print_commands(t_mini *mini)
         {
             printf("    No arguments\n");
         }
-        
-        // Print file descriptors
         printf("  File descriptors:\n");
         printf("    fd_in: %d\n", mini->commands[i].fd_in);
         printf("    fd_out: %d\n", mini->commands[i].fd_out);
         printf("    pipe_read: %d\n", mini->commands[i].pipe_read);
         printf("    pipe_write: %d\n", mini->commands[i].pipe_write);
-        
-        // Print flags
         printf("  Flags:\n");
         printf("    is_builtin: %d\n", mini->commands[i].is_builtin);
         printf("    has_input_redir: %d\n", mini->commands[i].has_input_redir);
@@ -63,7 +57,6 @@ void print_commands(t_mini *mini)
         printf("    append: %d\n", mini->commands[i].append);
         printf("    is_heredoc: %d\n", mini->commands[i].is_heredoc);
         printf("    exit_status: %d\n", mini->commands[i].exit_status);
-        
         printf("\n");
         i++;
     }
@@ -126,10 +119,7 @@ void main_loop(t_mini *mini)
         }
         add_history(line);
         if (parse_and_execute(line, mini) == ERROR)
-        {
-            free(line);
             continue;
-        }
         free(line);
     }
 }

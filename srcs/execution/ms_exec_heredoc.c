@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   exec_heredoc.c                                     :+:      :+:    :+:   */
+/*   ms_exec_heredoc.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/18 15:30:12 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/18 15:30:12 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/23 13:31:09 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,4 +98,34 @@ static int	process_heredoc_line(t_command *cmd, char *line, int pipe_fd[2])
 	write(pipe_fd[1], "\n", 1);
 	free(expanded_line);
 	return (SUCCESS);
+}
+
+char *remove_quotes(const char *str)
+{
+    int i;
+    int j;
+    int len;
+    char *result;
+    int in_quote[2];
+
+    len = ft_strlen(str);
+    result = malloc(len + 1);
+    if (!result)
+        return (NULL);
+    i = 0;
+    j = 0;
+    in_quote[0] = 0;
+    in_quote[1] = 0;
+    while (str[i])
+    {
+        if (str[i] == '\'' && !in_quote[1])
+            in_quote[0] = !in_quote[0];
+        else if (str[i] == '"' && !in_quote[0])
+            in_quote[1] = !in_quote[1];
+        else
+            result[j++] = str[i];
+        i++;
+    }
+    result[j] = '\0';
+    return (result);
 }

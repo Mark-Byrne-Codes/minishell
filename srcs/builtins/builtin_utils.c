@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 09:17:23 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/06 12:39:58 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/23 12:21:40 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,10 +50,12 @@ static int	execute_simple_builtin(t_mini *mini, t_command *cmd)
 	if (ft_strcmp(cmd->args[0], "echo") == 0)
 		return (echo_builtin(cmd->args));
 	else if (ft_strcmp(cmd->args[0], "pwd") == 0)
+	{
 		return (pwd_builtin());
+	}
 	else if (ft_strcmp(cmd->args[0], "env") == 0)
 		return (env_builtin(mini));
-	return (SUCCESS);
+	return (0);
 }
 
 static int	execute_complex_builtin(t_mini *mini, t_command *cmd)
@@ -66,7 +68,7 @@ static int	execute_complex_builtin(t_mini *mini, t_command *cmd)
 		return (unset_builtin(mini, cmd->args));
 	else if (ft_strcmp(cmd->args[0], "exit") == 0)
 		return (exit_builtin(mini, cmd->args));
-	return (SUCCESS);
+	return (0);
 }
 
 int	execute_builtin(t_mini *mini, int cmd_idx)
@@ -80,7 +82,7 @@ int	execute_builtin(t_mini *mini, int cmd_idx)
 	if (handle_io_for_builtin(mini, cmd, &saved_stdin, &saved_stdout) == ERROR)
 		return (ERROR);
 	result = execute_simple_builtin(mini, cmd);
-	if (result == SUCCESS)
+	if (result == 0)
 		result = execute_complex_builtin(mini, cmd);
 	if (mini->num_commands == 1)
 		restore_io(saved_stdin, saved_stdout);

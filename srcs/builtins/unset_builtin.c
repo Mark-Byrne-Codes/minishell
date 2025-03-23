@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 09:46:30 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/14 09:17:49 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/23 12:03:35 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ int	unset_builtin(t_mini *mini, char **args)
 	status = 0;
 	i = 1;
 	if (!args[1])
-		return (ft_putstr_fd("unset: not enough arguments\n", STDERR_FILENO), 0);
+		return (ft_putstr_fd("unset:\n", STDERR_FILENO), 0);
 	while (args[i])
 	{
 		if (!is_valid_identifier(args[i]))

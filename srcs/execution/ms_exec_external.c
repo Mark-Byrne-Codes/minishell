@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ms_exec_external.c                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/03/23 13:18:49 by mbyrne            #+#    #+#             */
+/*   Updated: 2025/03/23 13:18:50 by mbyrne           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/minishell.h"
 
 static int	handle_command_not_found(t_mini *mini, int cmd_idx)
@@ -86,5 +98,6 @@ int	launch_external(t_mini *mini, int cmd_idx)
 	}
 	result = execute_child_process(mini, cmd_idx, cmd_path);
 	free(cmd_path);
+	mini->commands[cmd_idx].args = NULL;
 	return (result);
 }

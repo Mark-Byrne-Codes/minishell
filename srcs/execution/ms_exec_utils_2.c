@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 13:00:40 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/21 13:00:41 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/23 15:01:55 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,6 @@ static int	handle_file_open_error(t_command *cmd, char *filename)
 	return (ERROR);
 }
 
-/**
- * Sets up input redirection with the specified file
- * Opens the file and sets the command's input file descriptor
- */
 int	setup_input_redir_file(t_command *cmd, char *file)
 {
 	int		fd;
@@ -44,10 +40,6 @@ int	setup_input_redir_file(t_command *cmd, char *file)
 	return (SUCCESS);
 }
 
-/**
- * Sets up output redirection with the specified file
- * Opens the file with appropriate flags and sets the command's output file descriptor
- */
 int	setup_output_redir_file(t_command *cmd, char *file, int append)
 {
 	int		fd;
@@ -83,24 +75,4 @@ int	execute_single_command(t_mini *mini, int i)
 	else
 		status = launch_external(mini, i);
 	return (status);
-}
-
-/**
- * Checks if a string contains only digits
- * Returns 1 if true, 0 if false
- */
-int	ft_is_numeric(char *str)
-{
-	int	i;
-
-	i = 0;
-	if (str[i] == '-' || str[i] == '+')
-		i++;
-	while (str[i])
-	{
-		if (!ft_isdigit(str[i]))
-			return (0);
-		i++;
-	}
-	return (1);
 }

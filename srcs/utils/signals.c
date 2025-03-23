@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/23 13:17:33 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/23 13:35:26 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/23 14:53:17 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,4 +29,3 @@ void	setup_signal_handlers(t_mini *mini)
 	signal(SIGINT, signal_handler_interactive);
 	signal(SIGQUIT, SIG_IGN);
 }
-

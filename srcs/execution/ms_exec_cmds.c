@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/12 11:16:34 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/21 10:00:24 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/23 14:46:43 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,5 +105,5 @@ int	execute_commands(t_mini *mini)
 		restore_io(saved_stdin, saved_stdout);
 		i++;
 	}
-	return (wait_for_children(mini, pipe_failed * ERROR + !pipe_failed * status));
+	return (wait_for_children(mini, pipe_failed * 1 + !pipe_failed * status));
 }

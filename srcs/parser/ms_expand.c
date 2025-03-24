@@ -12,7 +12,6 @@
 
 #include "../../includes/minishell.h"
 
-
 static char	*init_result(void)
 {
 	char	*result;
@@ -29,7 +28,7 @@ static int	should_expand_variable(char *str, int i, int in_quotes)
 		return (0);
 	if (str[i] == '$')
 	{
-		if (str[i + 1] == '?' || ft_isalpha(str[i + 1]) || str[i + 1] == '_')
+		if (str[i + 1] == '?' || ft_isalnum(str[i + 1]) || str[i + 1] == '_')
 			return (1);
 		if (in_quotes == 2 && str[i + 1] == '"')
 			return (1);
@@ -37,7 +36,8 @@ static int	should_expand_variable(char *str, int i, int in_quotes)
 	return (0);
 }
 
-static int	handle_variable_expansion(t_mini *mini, char *str, char **res, int i)
+static int	handle_variable_expansion(t_mini *mini, char *str,
+				char **res, int i)
 {
 	char	*var_name;
 	char	*var_value;
@@ -56,33 +56,33 @@ static int	handle_variable_expansion(t_mini *mini, char *str, char **res, int i)
 	if (ft_strcmp(var_name, "?") == 0)
 		name_len = 1;
 	free(var_name);
-	return (i + name_len + 1); 
+	return (i + name_len + 1);
 }
 
-static int append_char(char **result, char c)
+static int	append_char(char **result, char c)
 {
-    char *temp;
-    size_t result_len;
-    char *new_result;
+	char	*temp;
+	size_t	result_len;
+	char	*new_result;
 
-    temp = *result;
-    result_len = 0;
-    if (temp)
-        result_len = ft_strlen(temp);
-    new_result = malloc(result_len + 2);
-    if (!new_result)
-    {
-        free(temp);
-        *result = NULL;
-        return (0);
-    }
-    if (temp)
-        ft_memcpy(new_result, temp, result_len);
-    new_result[result_len] = c;
-    new_result[result_len + 1] = '\0';
-    *result = new_result;
-    free(temp);
-    return (1);
+	temp = *result;
+	result_len = 0;
+	if (temp)
+		result_len = ft_strlen(temp);
+	new_result = malloc(result_len + 2);
+	if (!new_result)
+	{
+		free(temp);
+		*result = NULL;
+		return (0);
+	}
+	if (temp)
+		ft_memcpy(new_result, temp, result_len);
+	new_result[result_len] = c;
+	new_result[result_len + 1] = '\0';
+	*result = new_result;
+	free(temp);
+	return (1);
 }
 
 char	*expand_variables(t_mini *mini, char *str, int in_quotes)

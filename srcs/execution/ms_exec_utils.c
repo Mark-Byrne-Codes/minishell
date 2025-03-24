@@ -12,39 +12,9 @@
 
 #include "../../includes/minishell.h"
 
-int	add_argument(t_command *cmd, char *arg, int arg_idx)
+static char	*check_direct_cmd(char *cmd)
 {
-	char	**new_args;
-	int		i;
-
-	new_args = malloc(sizeof(char *) * (arg_idx + 2));
-	if (!new_args)
-		return (ERROR);
-	i = 0;
-	while (i < arg_idx)
-	{
-		new_args[i] = cmd->args[i];
-		i++;
-	}
-	new_args[arg_idx] = ft_strdup(arg);
-	if (!new_args[arg_idx])
-	{
-		free(new_args);
-		return (ERROR);
-	}
-	new_args[arg_idx + 1] = NULL;
-	free(cmd->args);
-	cmd->args = new_args;
-	return (SUCCESS);
-}
-
-/**
- * Checks if a command is directly executable (either in current directory
- * or with a provided path)
- */
-static char *check_direct_cmd(char *cmd)
-{
-	struct stat file_stat;
+	struct stat	file_stat;
 
 	if (access(cmd, F_OK) == 0 && !ft_strchr(cmd, '/'))
 	{
@@ -60,29 +30,22 @@ static char *check_direct_cmd(char *cmd)
 	if (ft_strchr(cmd, '/'))
 	{
 		if (access(cmd, F_OK) == 0)
-		{
 			return (cmd);
-		}
 		return (NULL);
 	}
 	return (NULL);
 }
 
-/**
- * Gets the full path to a command by checking:
- * 1. If it's directly executable (via check_direct_cmd)
- * 2. If it exists in the PATH directories
- */
-char *get_command_path(char *cmd, t_env *env)
+char	*get_command_path(char *cmd, t_env *env)
 {
 	char	*path;
 	char	**dirs;
 	int		i;
 	char	*result;
 
-	if ((result = check_direct_cmd(cmd)))
+	result = check_direct_cmd(cmd);
+	if (result)
 		return (result);
-	
 	path = get_env_value(env, "PATH");
 	dirs = ft_split(path, ':');
 	i = -1;
@@ -100,33 +63,56 @@ char *get_command_path(char *cmd, t_env *env)
 	return (NULL);
 }
 
+static int	init_exit_status(t_mini *mini, int last_cmd_error)
+{
+	if (mini->num_commands > 1)
+	{
+		if (last_cmd_error)
+			return (1);
+		return (0);
+	}
+	if (mini->exit_status != 0)
+		return (mini->exit_status);
+	return (0);
+}
+
+static int	process_child_status(t_mini *mini, pid_t pid, int status,
+	int last_exit_status)
+{
+	if (pid == mini->last_pid)
+	{
+		if (WIFEXITED(status))
+		{
+			mini->exit_status = WEXITSTATUS(status);
+			if (!(mini->num_commands > 1
+					&& mini->commands[mini->num_commands - 1].error))
+				last_exit_status = mini->exit_status;
+		}
+		else if (WIFSIGNALED(status))
+			mini->exit_status = 128 + WTERMSIG(status);
+	}
+	return (last_exit_status);
+}
+
 int	wait_for_children(t_mini *mini, int last_status)
 {
 	int		status;
 	int		last_exit_status;
 	pid_t	pid;
+	int		last_cmd_error;
 
-	last_exit_status = 0;
+	last_cmd_error = mini->commands[mini->num_commands - 1].error;
+	last_exit_status = init_exit_status(mini, last_cmd_error);
 	pid = waitpid(-1, &status, WUNTRACED);
 	while (pid > 0)
 	{
-		if (pid == mini->last_pid)
-		{
-			if (WIFEXITED(status))
-			{
-				mini->exit_status = WEXITSTATUS(status);
-				last_exit_status = mini->exit_status;
-			}
-			else if (WIFSIGNALED(status))
-				mini->exit_status = 128 + WTERMSIG(status);
-		}
+		last_exit_status = process_child_status(mini, pid, status,
+				last_exit_status);
 		pid = waitpid(-1, &status, WUNTRACED);
 	}
 	if (mini->num_commands > 1)
-		return (mini->exit_status);
-	if (last_status != ERROR)
-		return (last_exit_status);
-	return (mini->exit_status = last_status);
+		mini->exit_status = last_exit_status;
+	else if (mini->exit_status == 0 && last_status != SUCCESS)
+		mini->exit_status = last_status;
+	return (mini->exit_status);
 }
-
-

@@ -16,12 +16,12 @@ static void	*fun_less_greater(t_lexer *lex, char *cmd)
 {
 	if (*cmd == '<' && *(cmd + 1) == '<' && !lex->squote && !lex->dquote)
 	{
-		cmd = fun_add_entry(lex, cmd, 2, TOKEN_REDIR_APPEND);
+		cmd = fun_add_entry(lex, cmd, 2, TOKEN_HEREDOC);
 		lex->red_delim++;
 	}
 	else if (*cmd == '>' && *(cmd + 1) == '>' && !lex->squote && !lex->dquote)
 	{
-		cmd = fun_add_entry(lex, cmd, 2, TOKEN_HEREDOC);
+		cmd = fun_add_entry(lex, cmd, 2, TOKEN_REDIR_APPEND);
 		lex->red_append++;
 	}
 	else if (*cmd == '<' && !lex->squote && !lex->dquote)
@@ -36,6 +36,8 @@ static void	*fun_less_greater(t_lexer *lex, char *cmd)
 	}
 	else
 		return (NULL);
+	while (*cmd && fun_check_ifs(*cmd))
+		cmd++;
 	return (cmd);
 }
 
@@ -46,31 +48,26 @@ static void	*fun_less_greater(t_lexer *lex, char *cmd)
  */
 void	*fun_charwise(t_lexer *lexer, char *command)
 {
-	while (*command)
+	if (*command == '$' && *(command + 1) == '\0'
+		&& !lexer->squote && !lexer->dquote)
+		return (fun_add_entry(lexer, command, 1, TOKEN_WORD));
+	else if (*command == 39)
+		return (fun_single_quote_string(lexer, command));
+	else if (*command == 34)
+		return (fun_double_quote_string(lexer, command));
+	else if (*command == '$' && !lexer->squote)
+		return (fun_variable_string(lexer, command));
+	else if (*command == '|' && !lexer->squote && !lexer->dquote)
 	{
-		if (*command == 39)
-			command = fun_single_quote_string(lexer, command);
-		else if (*command == 34)
-			command = fun_double_quote_string(lexer, command);
-		else if (*command == '$' && !lexer->squote)
-			command = fun_variable_string(lexer, command);
-		else if (*command == '|' && !lexer->squote && !lexer->dquote)
-		{
-			command = fun_add_entry(lexer, command, 1, TOKEN_PIPE);
-			lexer->pipes++;
-		}
-		else if (*command == '<' || *command == '>')
-		{
-			command = fun_less_greater(lexer, command);
-		}
-		else if (fun_check_ifs(*command) && !lexer->squote && !lexer->dquote)
-		{
-			command = fun_add_entry(lexer, command, 1, TOKEN_IFS);
-		}
-		else
-			command = fun_word_string(lexer, command);
+		command = fun_add_entry(lexer, command, 1, TOKEN_PIPE);
+		lexer->pipes++;
+		return (command);
 	}
-	return (command);
+	else if (*command == '<' || *command == '>')
+		return (fun_less_greater(lexer, command));
+	else if (fun_check_ifs(*command) && !lexer->squote && !lexer->dquote)
+		return (fun_add_entry(lexer, command, 1, TOKEN_IFS));
+	return (fun_word_string(lexer, command));
 }
 
 /*

@@ -30,21 +30,22 @@ static int	handle_command_not_found(t_mini *mini, int cmd_idx)
 static int	handle_execution_error(t_mini *mini, int cmd_idx)
 {
 	struct stat	file_stat;
+	char		*cmd;
 
+	cmd = mini->commands[cmd_idx].args[0];
 	if (cmd_idx == 0)
 	{
-		if (stat(mini->commands[cmd_idx].args[0], &file_stat) == 0 \
-		&& S_ISDIR(file_stat.st_mode))
+		if (stat(cmd, &file_stat) == 0 && S_ISDIR(file_stat.st_mode))
 		{
 			ft_putstr_fd("minishell: ", 2);
-			ft_putstr_fd(mini->commands[cmd_idx].args[0], 2);
+			ft_putstr_fd(cmd, 2);
 			ft_putendl_fd(": Is a directory", 2);
 			exit(126);
 		}
 		else
 		{
 			ft_putstr_fd("minishell: ", 2);
-			perror(mini->commands[cmd_idx].args[0]);
+			perror(cmd);
 		}
 	}
 	if (errno == ENOENT)
@@ -75,8 +76,10 @@ static int	execute_child_process(t_mini *mini, int cmd_idx, char *cmd_path)
 {
 	pid_t	pid;
 	int		is_builtin;
+	char	**args;
 
 	is_builtin = mini->commands[cmd_idx].is_builtin;
+	args = mini->commands[cmd_idx].args;
 	pid = fork();
 	if (pid == 0)
 	{
@@ -84,8 +87,7 @@ static int	execute_child_process(t_mini *mini, int cmd_idx, char *cmd_path)
 		if (is_builtin)
 			exit(execute_builtin(mini, cmd_idx));
 		close_other_pipes(mini, cmd_idx);
-		execve(cmd_path, mini->commands[cmd_idx].args,
-			env_list_to_array(mini->env));
+		execve(cmd_path, args, env_list_to_array(mini->env));
 		handle_execution_error(mini, cmd_idx);
 	}
 	else if (pid < 0)

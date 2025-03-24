@@ -20,122 +20,61 @@ static int	handle_pipe(t_list **temp, int *cmd_idx, int *arg_idx)
 	return (SUCCESS);
 }
 
-static int	handle_redirection_parse(t_mini *mini, t_command *cmd, t_list **temp)
+static int	handle_redirection_parser(t_mini *mini, t_command *cmd,
+	t_list **temp)
 {
 	if (ms_handle_redirection(mini, cmd, temp) == ERROR)
 		return (ERROR);
 	return (SUCCESS);
 }
 
-static int	handle_word_or_variable(t_mini *mini, t_command *cmd, 
-	t_token *data, int *arg_idx)
+static int	process_token(t_mini *mini, t_token *data, t_list **temp,
+			int *idx)
 {
-char	*expanded;
-int		added;
+	int	*cmd_idx;
+	int	*arg_idx;
 
-added = 0;
-expanded = expand_token(mini, data);
-if (!expanded)
-	return (ERROR);
-if (expanded[0] != '\0' || *arg_idx > 0)
-{
-	if (add_argument(cmd, expanded, *arg_idx) == ERROR)
-	{
-		free(expanded);
-		return (ERROR);
-	}
-	added = 1;
-	if (*arg_idx == 0 && data->token == TOKEN_WORD && is_builtin(expanded))
-		cmd->is_builtin = 1;
-	(*arg_idx)++;
-}
-if (!added)
-	free(expanded);
-return (SUCCESS);
+	cmd_idx = &idx[0];
+	arg_idx = &idx[1];
+	if (data->token == TOKEN_PIPE)
+		return (handle_pipe(temp, cmd_idx, arg_idx));
+	else if (data->token >= TOKEN_REDIR_IN && data->token <= TOKEN_HEREDOC)
+		return (handle_redirection_parser(mini,
+				&mini->commands[*cmd_idx], temp));
+	else if (data->token == TOKEN_WORD || data->token == TOKEN_VARIABLE)
+		return (handle_word_var(mini, &mini->commands[*cmd_idx],
+				data, arg_idx));
+	else if (data->token == TOKEN_SINGLE_Q_STRING)
+		return (handle_single_quote(&mini->commands[*cmd_idx], data, arg_idx));
+	else if (data->token == TOKEN_IFS)
+		*temp = (*temp)->next;
+	return (SUCCESS);
 }
 
-static int handle_single_quote(t_command *cmd, t_token *data, int *arg_idx)
-{
-    char *clean;
-
-    printf("DEBUG: Handling single quote token\n");
-    printf("DEBUG: Original string: '%s'\n", data->string);
-
-    clean = remove_quotes(data->string);
-    if (!clean)
-        return (ERROR);
-
-    printf("DEBUG: After remove_quotes: '%s'\n", clean);
-
-    if (add_argument(cmd, clean, *arg_idx) == ERROR)
-    {
-        free(clean);
-        return (ERROR);
-    }
-
-    printf("DEBUG: Added argument at index %d\n", *arg_idx);
-
-    if (*arg_idx == 0)
-    {
-        cmd->is_builtin = is_builtin(clean);
-        printf("DEBUG: Is builtin: %d\n", cmd->is_builtin);
-    }
-
-    (*arg_idx)++;
-    free(clean);
-    return (SUCCESS);
-}
-
-/* ================== Updated Process Token Flow ================== */
-static int	process_token(t_mini *mini, t_token *data, t_list **temp, 
-	int *cmd_idx, int *arg_idx)
-{
-if (data->token == TOKEN_PIPE)
-{
-	if (handle_pipe(temp, cmd_idx, arg_idx) == ERROR)
-		return (ERROR);
-}
-else if (data->token >= TOKEN_REDIR_IN && data->token <= TOKEN_HEREDOC)
-{
-	if (handle_redirection_parse(mini, &mini->commands[*cmd_idx], temp) == ERROR)
-		return (ERROR);
-}
-else if (data->token == TOKEN_WORD || data->token == TOKEN_VARIABLE)
-{
-	if (handle_word_or_variable(mini, &mini->commands[*cmd_idx], 
-			data, arg_idx) == ERROR)
-		return (ERROR);
-}
-else if (data->token == TOKEN_SINGLE_Q_STRING)
-{
-	if (handle_single_quote(&mini->commands[*cmd_idx], data, arg_idx) == ERROR)
-		return (ERROR);
-}
-else if (data->token == TOKEN_IFS)
-{
-	*temp = (*temp)->next;
-}
-return (SUCCESS);
-}
-
-int	ms_process_tokens(t_mini *mini, t_lexer *lexer)
+static int	process_token_list(t_mini *mini, t_lexer *lexer)
 {
 	t_list	*temp;
 	t_token	*data;
-	int		cmd_idx;
-	int		arg_idx;
+	int		idx[2];
 
 	temp = lexer->dictionary;
-	cmd_idx = 0;
-	arg_idx = 0;
+	idx[0] = 0;
+	idx[1] = 0;
 	while (temp)
 	{
 		data = (t_token *)temp->content;
-		if (process_token(mini, data, &temp, &cmd_idx, &arg_idx) == ERROR)
+		if (process_token(mini, data, &temp, idx) == ERROR)
 			return (ERROR);
 		if (data->token != TOKEN_PIPE && data->token != TOKEN_IFS
 			&& !(data->token >= TOKEN_REDIR_IN && data->token <= TOKEN_HEREDOC))
 			temp = temp->next;
 	}
 	return (SUCCESS);
+}
+
+int	ms_process_tokens(t_mini *mini, t_lexer *lexer)
+{
+	if (concat_adjacent_strings(lexer) == ERROR)
+		return (ERROR);
+	return (process_token_list(mini, lexer));
 }

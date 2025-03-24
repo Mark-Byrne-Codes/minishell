@@ -22,7 +22,8 @@ void	*fun_variable_string(t_lexer *lexer, char *cmd)
 	int	len;
 
 	len = 0;
-	while (cmd[len] != '\0' && !fun_check_ifs(cmd[len]) && !fun_check_any_quote(cmd[len]))
+	while (cmd[len] != '\0' && !fun_check_ifs(cmd[len])
+		&& !fun_check_any_quote(cmd[len]))
 		len++;
 	cmd = fun_add_entry(lexer, cmd, len, TOKEN_VARIABLE);
 	lexer->vars++;
@@ -37,12 +38,14 @@ void	*fun_variable_string(t_lexer *lexer, char *cmd)
  */
 void	*fun_word_string(t_lexer *lexer, char *cmd)
 {
-	int	len;
+	int	i;
 
-	len = 0;
-	while (cmd[len] != '\0' && !fun_check_ifs(cmd[len]) && !fun_check_any_quote(cmd[len]))
-		len++;
-	cmd = fun_add_entry(lexer, cmd, len, TOKEN_WORD);
+	i = 0;
+	while (cmd[i] && !fun_check_ifs(cmd[i]) && !fun_check_any_quote(cmd[i])
+		&& cmd[i] != '$' && cmd[i] != '|' && cmd[i] != '<' && cmd[i] != '>')
+		i++;
+	if (i > 0)
+		cmd = fun_add_entry(lexer, cmd, i, TOKEN_WORD);
 	return (cmd);
 }
 
@@ -58,21 +61,15 @@ void	*fun_double_quote_string(t_lexer *lexer, char *command)
 	char *content;
 
 	fun_flag_flipper(&lexer->dquote);
-	start = command + 1; // Skip the opening quote
+	start = command + 1;
 	len = 0;
 	while (start[len] != '\0' && start[len] != '"')
 		len++;
-
-	// Extract the content between quotes
 	content = ft_substr(start, 0, len);
 	if (!content)
 		return (NULL);
-
-	// Add the content as a word token
 	fun_add_entry(lexer, content, len, TOKEN_WORD);
 	free(content);
-
-	// Skip past the closing quote if we found one
 	if (start[len] == '"')
 	{
 		fun_flag_flipper(&lexer->dquote);
@@ -80,7 +77,6 @@ void	*fun_double_quote_string(t_lexer *lexer, char *command)
 	}
 	else
 	{
-		// No closing quote found
 		return (start + len);
 	}
 }
@@ -97,21 +93,15 @@ void	*fun_single_quote_string(t_lexer *lexer, char *command)
 	char *content;
 
 	fun_flag_flipper(&lexer->squote);
-	start = command + 1; // Skip the opening quote
+	start = command + 1;
 	len = 0;
 	while (start[len] != '\0' && start[len] != '\'')
 		len++;
-
-	// Extract the content between quotes
 	content = ft_substr(start, 0, len);
 	if (!content)
 		return (NULL);
-
-	// Add the content as a word token
-	fun_add_entry(lexer, content, len, TOKEN_WORD);
+	fun_add_entry(lexer, content, len, TOKEN_SINGLE_Q_STRING);
 	free(content);
-
-	// Skip past the closing quote if we found one
 	if (start[len] == '\'')
 	{
 		fun_flag_flipper(&lexer->squote);
@@ -119,7 +109,6 @@ void	*fun_single_quote_string(t_lexer *lexer, char *command)
 	}
 	else
 	{
-		// No closing quote found
 		return (start + len);
 	}
 }

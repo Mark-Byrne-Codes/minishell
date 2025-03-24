@@ -217,5 +217,10 @@ void	free_token(t_token *token);
 // Token Handling
 int		ms_handle_redirection(t_mini *mini, t_command *cmd, t_list **temp);
 int		ms_process_tokens(t_mini *mini, t_lexer *lexer);
+int	handle_word_var(t_mini *mini, t_command *cmd, t_token *data, int *idx);
+int	handle_single_quote(t_command *cmd, t_token *data, int *arg_idx);
+int	concat_adjacent_strings(t_lexer *lexer);
+
+void print_commands(t_mini *mini);
 
 #endif

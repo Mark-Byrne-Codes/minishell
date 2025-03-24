@@ -25,12 +25,14 @@ static int	handle_pipe_setup(t_mini *mini, int i)
 {
 	if (i < mini->num_commands - 1)
 	{
-		if (dup2(mini->commands[i].pipe_write, STDOUT_FILENO) == -1)
+		if (mini->commands[i].pipe_write != -1 && \
+			dup2(mini->commands[i].pipe_write, STDOUT_FILENO) == -1)
 			return (ERROR);
 	}
 	if (i > 0)
 	{
-		if (dup2(mini->commands[i].pipe_read, STDIN_FILENO) == -1)
+		if (mini->commands[i].pipe_read != -1 && \
+			dup2(mini->commands[i].pipe_read, STDIN_FILENO) == -1)
 			return (ERROR);
 	}
 	return (SUCCESS);
@@ -66,19 +68,14 @@ static int	prepare_command(t_mini *mini, int i,
 	if (setup_io(saved_stdin, saved_stdout) == ERROR)
 		return (ERROR);
 	if (setup_pipes(mini, i) == ERROR)
-	{
-		restore_io(*saved_stdin, *saved_stdout);
 		return (ERROR);
-	}
 	if (handle_pipe_setup(mini, i) == ERROR)
 		return (ERROR);
 	if (mini->commands[i].redirections)
 	{
-		if (handle_redirection(mini, &mini->commands[i]) == ERROR
-			&& mini->commands[i].error)
+		if (handle_redirection(mini, &mini->commands[i]) == ERROR)
 		{
-			close_fds(&mini->commands[i]);
-			restore_io(*saved_stdin, *saved_stdout);
+			mini->commands[i].error = 1;
 			return (ERROR);
 		}
 	}
@@ -98,12 +95,17 @@ int	execute_commands(t_mini *mini)
 	while (i < mini->num_commands)
 	{
 		if (prepare_command(mini, i, &saved_stdin, &saved_stdout) == ERROR)
+		{
 			pipe_failed = 1;
+			mini->commands[i].error = 1;
+		}
 		else
 			status = execute_single_command(mini, i);
 		close_fds(&mini->commands[i]);
 		restore_io(saved_stdin, saved_stdout);
 		i++;
 	}
+	if (mini->num_commands == 1 && mini->commands[0].error)
+		mini->exit_status = 1;
 	return (wait_for_children(mini, pipe_failed * 1 + !pipe_failed * status));
 }

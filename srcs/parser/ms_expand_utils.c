@@ -67,7 +67,9 @@ char	*get_var_name(const char *str)
 		i++;
 	if (i == 0)
 		return (NULL);
-	name = ft_strdup(str);
+	name = ft_substr(str, 0, i);
+	if (!name)
+		return (NULL);
 	return (name);
 }
 

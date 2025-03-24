@@ -56,6 +56,7 @@ SRCS_PARSE = srcs/parser/ms_lexer_utils.c \
 					srcs/parser/ms_parser_utils.c \
 					srcs/parser/ms_expand_utils.c \
 					srcs/parser/ms_parser.c \
+					srcs/parser/ms_token_processor.c \
 
 
 SRCS = $(SRCS_MAIN) $(SRCS_ENV) $(SRCS_UTILS) $(SRCS_BUILTINS) $(SRCS_EXEC) $(SRCS_PARSE)

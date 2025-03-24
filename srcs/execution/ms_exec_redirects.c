@@ -23,12 +23,13 @@ static int	process_redirection(t_mini *mini, t_command *cmd, t_redirection *r)
 		return (setup_input_redir_file(cmd, r->file));
 	else if (r->type == TOKEN_REDIR_OUT)
 		return (setup_output_redir_file(cmd, r->file, 0));
-	else if (r->type == TOKEN_HEREDOC)
-		return (setup_output_redir_file(cmd, r->file, 1));
 	else if (r->type == TOKEN_REDIR_APPEND)
+		return (setup_output_redir_file(cmd, r->file, 1));
+	else if (r->type == TOKEN_HEREDOC)
 		return (setup_heredoc_delim(cmd, r->file));
 	return (SUCCESS);
 }
+
 /**
  * Handles all redirections for a command
  * Processes each redirection in the command's redirection list
@@ -43,12 +44,16 @@ int	handle_redirection(t_mini *mini, t_command *cmd)
 	while (redir && !redir_error)
 	{
 		if (process_redirection(mini, cmd, redir) == ERROR)
+		{
 			redir_error = 1;
+			cmd->error = 1;
+		}
 		redir = redir->next;
 	}
 	if (redir_error)
 	{
 		mini->exit_status = 1;
+		cmd->exit_status = 1;
 		return (ERROR);
 	}
 	if (apply_redirections(cmd) == ERROR)
@@ -65,14 +70,22 @@ int	apply_redirections(t_command *cmd)
 	if (cmd->has_input_redir && cmd->fd_in != STDIN_FILENO)
 	{
 		if (dup2(cmd->fd_in, STDIN_FILENO) == -1)
+		{
+			cmd->error = 1;
+			cmd->exit_status = 1;
 			return (ERROR);
+		}
 		if (!cmd->is_heredoc)
 			close(cmd->fd_in);
 	}
 	if (cmd->has_output_redir && cmd->fd_out != STDOUT_FILENO)
 	{
 		if (dup2(cmd->fd_out, STDOUT_FILENO) == -1)
+		{
+			cmd->error = 1;
+			cmd->exit_status = 1;
 			return (ERROR);
+		}
 		close(cmd->fd_out);
 	}
 	return (SUCCESS);

@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:54:23 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/24 09:22:57 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/24 13:24:02 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,12 +60,9 @@ char	*get_var_name(const char *str)
 	char	*name;
 
 	i = 0;
-	// Skip $ character
 	str++;
-	// Handle special case of $? for exit status
 	if (str[0] == '?')
 		return (ft_strdup("?"));
-	// Count length of variable name
 	while (str[i] && (ft_isalnum(str[i]) || str[i] == '_'))
 		i++;
 	if (i == 0)

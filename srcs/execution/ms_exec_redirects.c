@@ -6,14 +6,29 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/12 11:16:39 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/23 14:46:02 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/24 13:23:18 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 
-static int	process_redirection(t_mini *mini, t_command *cmd, t_redirection *r);
-
+/**
+ * Processes a single redirection
+ * Calls the appropriate setup function based on the redirection type
+ */
+static int	process_redirection(t_mini *mini, t_command *cmd, t_redirection *r)
+{
+	(void)mini;
+	if (r->type == TOKEN_REDIR_IN)
+		return (setup_input_redir_file(cmd, r->file));
+	else if (r->type == TOKEN_REDIR_OUT)
+		return (setup_output_redir_file(cmd, r->file, 0));
+	else if (r->type == TOKEN_HEREDOC)
+		return (setup_output_redir_file(cmd, r->file, 1));
+	else if (r->type == TOKEN_REDIR_APPEND)
+		return (setup_heredoc_delim(cmd, r->file));
+	return (SUCCESS);
+}
 /**
  * Handles all redirections for a command
  * Processes each redirection in the command's redirection list
@@ -38,24 +53,6 @@ int	handle_redirection(t_mini *mini, t_command *cmd)
 	}
 	if (apply_redirections(cmd) == ERROR)
 		return (ERROR);
-	return (SUCCESS);
-}
-
-/**
- * Processes a single redirection
- * Calls the appropriate setup function based on the redirection type
- */
-static int	process_redirection(t_mini *mini, t_command *cmd, t_redirection *r)
-{
-	(void)mini;
-	if (r->type == TOKEN_REDIR_IN)
-		return (setup_input_redir_file(cmd, r->file));
-	else if (r->type == TOKEN_REDIR_OUT)
-		return (setup_output_redir_file(cmd, r->file, 0));
-	else if (r->type == TOKEN_HEREDOC)
-		return (setup_output_redir_file(cmd, r->file, 1));
-	else if (r->type == TOKEN_REDIR_APPEND)
-		return (setup_heredoc_delim(cmd, r->file));
 	return (SUCCESS);
 }
 

@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/23 14:55:17 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/24 09:38:54 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/24 13:20:25 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,60 +38,66 @@ int	add_argument(t_command *cmd, char *arg, int arg_idx)
 	return (SUCCESS);
 }
 
-static char *check_local_or_absolute_path(char *cmd)
+/**
+ * Checks if a command is directly executable (either in current directory
+ * or with a provided path)
+ */
+static char *check_direct_cmd(char *cmd)
 {
-    struct stat file_stat;
+	struct stat file_stat;
 
-    if (access(cmd, F_OK) == 0)
-    {
-        if (stat(cmd, &file_stat) == 0 && S_ISREG(file_stat.st_mode))
-        {
-            if (access(cmd, X_OK) == 0)
-                return (ft_strdup(cmd));
-            errno = EACCES;
-            return (ft_strdup(cmd));
-        }
-    }
-    return (NULL);
+	if (access(cmd, F_OK) == 0 && !ft_strchr(cmd, '/'))
+	{
+		if (stat(cmd, &file_stat) == 0 && S_ISREG(file_stat.st_mode))
+		{
+			if (access(cmd, X_OK) != 0)
+			{
+				errno = EACCES;
+				return (ft_strdup(cmd));
+			}
+		}
+	}
+	if (ft_strchr(cmd, '/'))
+	{
+		if (access(cmd, F_OK) == 0)
+		{
+			return (cmd);
+		}
+		return (NULL);
+	}
+	return (NULL);
 }
 
-static char *search_path_directories(char *cmd, t_env *env)
-{
-    char *path;
-    char **dirs;
-    int i;
-
-    path = get_env_value(env, "PATH");
-    if (!path)
-        return (NULL);
-    dirs = ft_split(path, ':');
-    if (!dirs)
-        return (NULL);
-    i = -1;
-    while (dirs[++i])
-    {
-        path = ft_strjoin3(dirs[i], "/", cmd);
-        if (access(path, X_OK) == 0)
-        {
-            free_string_array(dirs);
-            return (path);
-        }
-        free(path);
-    }
-    free_string_array(dirs);
-    return (NULL);
-}
-
+/**
+ * Gets the full path to a command by checking:
+ * 1. If it's directly executable (via check_direct_cmd)
+ * 2. If it exists in the PATH directories
+ */
 char *get_command_path(char *cmd, t_env *env)
 {
-    char *result;
+	char	*path;
+	char	**dirs;
+	int		i;
+	char	*result;
 
-    if (ft_strchr(cmd, '/'))
-        return (check_local_or_absolute_path(cmd));
-    result = check_local_or_absolute_path(cmd);
-    if (result)
-        return (result);
-    return (search_path_directories(cmd, env));
+	if ((result = check_direct_cmd(cmd)))
+		return (result);
+	
+	path = get_env_value(env, "PATH");
+	dirs = ft_split(path, ':');
+	i = -1;
+	while (dirs[++i])
+	{
+		path = ft_strjoin3(dirs[i], "/", cmd);
+		if (access(path, X_OK) == 0)
+		{
+			free_string_array(dirs);
+			return (path);
+		}
+		free(path);
+	}
+	free_string_array(dirs);
+	return (NULL);
 }
 
 int	wait_for_children(t_mini *mini, int last_status)

@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/23 14:55:49 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/23 15:01:15 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/24 13:32:49 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,10 @@
 
 static int	handle_command_not_found(t_mini *mini, int cmd_idx)
 {
-	// Only print error for the first command or when not in a pipeline
 	if (cmd_idx == 0 || mini->num_commands == 1)
 	{
 		ft_putstr_fd("minishell: ", 2);
 		ft_putstr_fd(mini->commands[cmd_idx].args[0], 2);
-		
-		// Check if the command contains a slash (absolute or relative path)
 		if (ft_strchr(mini->commands[cmd_idx].args[0], '/'))
 			ft_putendl_fd(": No such file or directory", 2);
 		else
@@ -32,11 +29,12 @@ static int	handle_command_not_found(t_mini *mini, int cmd_idx)
 
 static int	handle_execution_error(t_mini *mini, int cmd_idx)
 {
-	struct stat file_stat;
-	
+	struct stat	file_stat;
+
 	if (cmd_idx == 0)
 	{
-		if (stat(mini->commands[cmd_idx].args[0], &file_stat) == 0 && S_ISDIR(file_stat.st_mode))
+		if (stat(mini->commands[cmd_idx].args[0], &file_stat) == 0 \
+		&& S_ISDIR(file_stat.st_mode))
 		{
 			ft_putstr_fd("minishell: ", 2);
 			ft_putstr_fd(mini->commands[cmd_idx].args[0], 2);
@@ -103,7 +101,6 @@ int	launch_external(t_mini *mini, int cmd_idx)
 
 	if (!mini->commands[cmd_idx].args || !mini->commands[cmd_idx].args[0])
 		return (SUCCESS);
-		
 	if (mini->commands[cmd_idx].is_builtin)
 		return (execute_child_process(mini, cmd_idx, NULL));
 	cmd_path = get_command_path(mini->commands[cmd_idx].args[0], mini->env);

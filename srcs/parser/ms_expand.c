@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:59:13 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/23 14:03:20 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/24 13:24:27 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,16 +25,13 @@ static char	*init_result(void)
 
 static int	should_expand_variable(char *str, int i, int in_quotes)
 {
-	// Don't expand variables in single quotes (in_quotes == 1)
 	if (in_quotes == 1)
 		return (0);
-	
-	// Check if this is a valid variable reference
 	if (str[i] == '$')
 	{
 		if (str[i + 1] == '?' || ft_isalpha(str[i + 1]) || str[i + 1] == '_')
 			return (1);
-		if (in_quotes == 2 && str[i + 1] == '"') // Handle $" in double quotes
+		if (in_quotes == 2 && str[i + 1] == '"')
 			return (1);
 	}
 	return (0);

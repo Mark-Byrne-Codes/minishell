@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 13:00:40 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/23 15:01:55 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/24 09:37:46 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,4 +77,26 @@ int	execute_single_command(t_mini *mini, int i)
 	else
 		status = launch_external(mini, i);
 	return (status);
+}
+
+int init_commands(t_mini *mini, int num_commands)
+{
+    int i;
+
+    mini->num_commands = num_commands;
+    mini->commands = ft_calloc(num_commands, sizeof(t_command));
+    if (!mini->commands)
+        return (ERROR);
+    i = 0;
+    while (i < num_commands)
+    {
+        ft_memset(&mini->commands[i], 0, sizeof(t_command));
+        mini->commands[i].fd_in = STDIN_FILENO;
+        mini->commands[i].fd_out = STDOUT_FILENO;
+        mini->commands[i].pipe_read = -1;
+        mini->commands[i].pipe_write = -1;
+        mini->commands[i].mini = mini;
+        i++;
+    }
+    return (SUCCESS);
 }

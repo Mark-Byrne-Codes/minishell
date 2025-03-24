@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/23 12:33:39 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/23 13:16:36 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/24 09:23:51 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,37 +28,65 @@ static int	handle_redirection_parse(t_mini *mini, t_command *cmd, t_list **temp)
 }
 
 static int	handle_word_or_variable(t_mini *mini, t_command *cmd, 
-		t_token *data, int *arg_idx)
+	t_token *data, int *arg_idx)
 {
-	char *expanded;
-	
-	expanded = expand_token(mini, data);
-	if (!expanded)
-		return (ERROR);
-	
-	// Skip empty arguments at the beginning of a command
-	if (expanded[0] != '\0' || *arg_idx > 0)
+char	*expanded;
+int		added;
+
+added = 0;
+expanded = expand_token(mini, data);
+if (!expanded)
+	return (ERROR);
+if (expanded[0] != '\0' || *arg_idx > 0)
+{
+	if (add_argument(cmd, expanded, *arg_idx) == ERROR)
 	{
-		if (add_argument(cmd, expanded, *arg_idx) == ERROR)
-		{
-			free(expanded);
-			return (ERROR);
-		}
-		if (*arg_idx == 0 && data->token == TOKEN_WORD && is_builtin(expanded))
-			cmd->is_builtin = 1;
-		(*arg_idx)++;
+		free(expanded);
+		return (ERROR);
 	}
-	
+	added = 1;
+	if (*arg_idx == 0 && data->token == TOKEN_WORD && is_builtin(expanded))
+		cmd->is_builtin = 1;
+	(*arg_idx)++;
+}
+if (!added)
 	free(expanded);
-	return (SUCCESS);
+return (SUCCESS);
 }
 
-static int	handle_ifs(t_list **temp)
+static int handle_single_quote(t_command *cmd, t_token *data, int *arg_idx)
 {
-	*temp = (*temp)->next;
-	return (SUCCESS);
+    char *clean;
+
+    printf("DEBUG: Handling single quote token\n");
+    printf("DEBUG: Original string: '%s'\n", data->string);
+
+    clean = remove_quotes(data->string);
+    if (!clean)
+        return (ERROR);
+
+    printf("DEBUG: After remove_quotes: '%s'\n", clean);
+
+    if (add_argument(cmd, clean, *arg_idx) == ERROR)
+    {
+        free(clean);
+        return (ERROR);
+    }
+
+    printf("DEBUG: Added argument at index %d\n", *arg_idx);
+
+    if (*arg_idx == 0)
+    {
+        cmd->is_builtin = is_builtin(clean);
+        printf("DEBUG: Is builtin: %d\n", cmd->is_builtin);
+    }
+
+    (*arg_idx)++;
+    free(clean);
+    return (SUCCESS);
 }
 
+/* ================== Updated Process Token Flow ================== */
 static int	process_token(t_mini *mini, t_token *data, t_list **temp, 
 	int *cmd_idx, int *arg_idx)
 {
@@ -72,17 +100,20 @@ else if (data->token >= TOKEN_REDIR_IN && data->token <= TOKEN_HEREDOC)
 	if (handle_redirection_parse(mini, &mini->commands[*cmd_idx], temp) == ERROR)
 		return (ERROR);
 }
-else if (data->token == TOKEN_WORD || data->token == TOKEN_VARIABLE || 
-		 data->token == TOKEN_SINGLE_Q_STRING)
+else if (data->token == TOKEN_WORD || data->token == TOKEN_VARIABLE)
 {
 	if (handle_word_or_variable(mini, &mini->commands[*cmd_idx], 
 			data, arg_idx) == ERROR)
 		return (ERROR);
 }
+else if (data->token == TOKEN_SINGLE_Q_STRING)
+{
+	if (handle_single_quote(&mini->commands[*cmd_idx], data, arg_idx) == ERROR)
+		return (ERROR);
+}
 else if (data->token == TOKEN_IFS)
 {
-	if (handle_ifs(temp) == ERROR)
-		return (ERROR);
+	*temp = (*temp)->next;
 }
 return (SUCCESS);
 }

@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/23 14:55:17 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/23 15:02:21 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/24 09:38:54 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,87 +38,60 @@ int	add_argument(t_command *cmd, char *arg, int arg_idx)
 	return (SUCCESS);
 }
 
-static void	init_command(t_command *cmd, t_mini *mini)
+static char *check_local_or_absolute_path(char *cmd)
 {
-	cmd->args = NULL;
-	cmd->fd_in = STDIN_FILENO;
-	cmd->fd_out = STDOUT_FILENO;
-	cmd->pipe_read = -1;
-	cmd->pipe_write = -1;
-	cmd->is_builtin = 0;
-	cmd->exit_status = 0;
-	cmd->has_input_redir = 0;
-	cmd->has_output_redir = 0;
-	cmd->append = 0;
-	cmd->is_heredoc = 0;
-	cmd->mini = mini;
-	cmd->error = 0;
+    struct stat file_stat;
+
+    if (access(cmd, F_OK) == 0)
+    {
+        if (stat(cmd, &file_stat) == 0 && S_ISREG(file_stat.st_mode))
+        {
+            if (access(cmd, X_OK) == 0)
+                return (ft_strdup(cmd));
+            errno = EACCES;
+            return (ft_strdup(cmd));
+        }
+    }
+    return (NULL);
 }
 
-int	init_commands(t_mini *mini, int num_commands)
+static char *search_path_directories(char *cmd, t_env *env)
 {
-	int	i;
+    char *path;
+    char **dirs;
+    int i;
 
-	mini->num_commands = num_commands;
-	mini->commands = ft_calloc(num_commands, sizeof(t_command));
-	if (!mini->commands)
-		return (ERROR);
-	i = 0;
-	while (i < num_commands)
-	{
-		init_command(&mini->commands[i], mini);
-		i++;
-	}
-	return (SUCCESS);
+    path = get_env_value(env, "PATH");
+    if (!path)
+        return (NULL);
+    dirs = ft_split(path, ':');
+    if (!dirs)
+        return (NULL);
+    i = -1;
+    while (dirs[++i])
+    {
+        path = ft_strjoin3(dirs[i], "/", cmd);
+        if (access(path, X_OK) == 0)
+        {
+            free_string_array(dirs);
+            return (path);
+        }
+        free(path);
+    }
+    free_string_array(dirs);
+    return (NULL);
 }
 
-char	*get_command_path(char *cmd, t_env *env)
+char *get_command_path(char *cmd, t_env *env)
 {
-	char	*path;
-	char	**dirs;
-	int		i;
-	struct stat file_stat;
+    char *result;
 
-	if (access(cmd, F_OK) == 0 && !ft_strchr(cmd, '/'))
-	{
-		if (stat(cmd, &file_stat) == 0 && S_ISREG(file_stat.st_mode))
-		{
-			if (access(cmd, X_OK) != 0)
-			{
-				errno = EACCES;
-				return (ft_strdup(cmd));
-			}
-		}
-	}
-	if (ft_strchr(cmd, '/'))
-	{
-		if (access(cmd, F_OK) == 0)
-		{
-			if (stat(cmd, &file_stat) == 0 && S_ISREG(file_stat.st_mode))
-			{
-				if (access(cmd, X_OK) == 0)
-					return (cmd);
-				return (cmd);
-			}
-			return (cmd);
-		}
-		return (NULL);
-	}
-	path = get_env_value(env, "PATH");
-	dirs = ft_split(path, ':');
-	i = -1;
-	while (dirs[++i])
-	{
-		path = ft_strjoin3(dirs[i], "/", cmd);
-		if (access(path, X_OK) == 0)
-		{
-			free_string_array(dirs);
-			return (path);
-		}
-		free(path);
-	}
-	free_string_array(dirs);
-	return (NULL);
+    if (ft_strchr(cmd, '/'))
+        return (check_local_or_absolute_path(cmd));
+    result = check_local_or_absolute_path(cmd);
+    if (result)
+        return (result);
+    return (search_path_directories(cmd, env));
 }
 
 int	wait_for_children(t_mini *mini, int last_status)
@@ -147,7 +120,6 @@ int	wait_for_children(t_mini *mini, int last_status)
 		return (mini->exit_status);
 	if (last_status != ERROR)
 		return (last_exit_status);
-	mini->exit_status = last_status;
 	return (mini->exit_status = last_status);
 }
 

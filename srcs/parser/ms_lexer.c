@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 15:09:57 by elehtone          #+#    #+#             */
-/*   Updated: 2025/03/23 14:30:57 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/24 09:02:19 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,46 +84,6 @@ static void	fun_fill_dictionary(t_lexer *lexer, char *command)
 	{
 		command = fun_charwise(lexer, command);
 	}
-}
-
-/**
- * Handles token expansion
- * Expands variables and adds arguments to the command
- */
-int	ms_handle_token_expansion(t_mini *mini, t_command *cmd, 
-	t_token *token, int *arg_idx)
-{
-char	*expanded;
-
-expanded = expand_token(mini, token);
-if (!expanded)
-	return (ERROR);
-if (expanded[0] != '\0')
-{
-	if (add_argument(cmd, expanded, *arg_idx) == ERROR)
-	{
-		free(expanded);
-		return (ERROR);
-	}
-	if (*arg_idx == 0 && token->token == TOKEN_WORD && is_builtin(expanded))
-		cmd->is_builtin = 1;
-	(*arg_idx)++;
-}
-free(expanded);
-return (SUCCESS);
-}
-
-/**
- * Handles pipe tokens in the parser
- * Increments command index and resets argument index
- */
-int	ms_handle_pipe(t_mini *mini, t_list **temp, int *cmd_idx, int *arg_idx)
-{
-	(void)mini;
-	*cmd_idx += 1;
-	*arg_idx = 0;
-	*temp = (*temp)->next;
-	return (SUCCESS);
 }
 
 /**

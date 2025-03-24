@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 09:46:19 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/23 12:19:02 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/24 09:26:36 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ static int	set_env_var_internal(t_mini *mini, const char *arg)
 	{
 		if (name)
 		{
-			ft_putstr_fd("minishell: export: `", STDERR_FILENO);
+			ft_putstr_fd("minishell: export: ", STDERR_FILENO);
 			ft_putstr_fd(name, STDERR_FILENO);
 			ft_putstr_fd("': not a valid identifier\n", STDERR_FILENO);
 			free(name);

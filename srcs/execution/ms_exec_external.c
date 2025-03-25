@@ -40,7 +40,8 @@ static int	handle_execution_error(t_mini *mini, int cmd_idx)
 			ft_putstr_fd("minishell: ", 2);
 			ft_putstr_fd(cmd, 2);
 			ft_putendl_fd(": Is a directory", 2);
-			exit(126);
+			mini->exit_status = 126;
+			return (126);
 		}
 		else
 		{
@@ -49,8 +50,10 @@ static int	handle_execution_error(t_mini *mini, int cmd_idx)
 		}
 	}
 	if (errno == ENOENT)
-		exit(127);
-	exit(126);
+		mini->exit_status = 127;
+	else
+		mini->exit_status = 126;
+	return (mini->exit_status);
 }
 
 static void	close_other_pipes(t_mini *mini, int cmd_idx)
@@ -77,6 +80,8 @@ static int	execute_child_process(t_mini *mini, int cmd_idx, char *cmd_path)
 	pid_t	pid;
 	int		is_builtin;
 	char	**args;
+	int		exit_status;
+	char	**env_array;
 
 	is_builtin = mini->commands[cmd_idx].is_builtin;
 	args = mini->commands[cmd_idx].args;
@@ -87,8 +92,11 @@ static int	execute_child_process(t_mini *mini, int cmd_idx, char *cmd_path)
 		if (is_builtin)
 			exit(execute_builtin(mini, cmd_idx));
 		close_other_pipes(mini, cmd_idx);
-		execve(cmd_path, args, env_list_to_array(mini->env));
-		handle_execution_error(mini, cmd_idx);
+		env_array = env_list_to_array(mini->env);
+		execve(cmd_path, args, env_array);
+		free_string_array(env_array);
+		exit_status = handle_execution_error(mini, cmd_idx);
+		exit(exit_status);
 	}
 	else if (pid < 0)
 		return (ERROR);
@@ -100,22 +108,25 @@ int	launch_external(t_mini *mini, int cmd_idx)
 {
 	char	*cmd_path;
 	int		result;
+	int		is_allocated;
 
 	if (!mini->commands[cmd_idx].args || !mini->commands[cmd_idx].args[0])
 		return (SUCCESS);
 	if (mini->commands[cmd_idx].is_builtin)
 		return (execute_child_process(mini, cmd_idx, NULL));
 	cmd_path = get_command_path(mini->commands[cmd_idx].args[0], mini->env);
+	is_allocated = (cmd_path != mini->commands[cmd_idx].args[0]);
 	if (!cmd_path)
 		return (handle_command_not_found(mini, cmd_idx));
 	if (mini->commands[cmd_idx].error)
 	{
-		free(cmd_path);
+		if (is_allocated)
+			free(cmd_path);
 		mini->exit_status = 1;
 		return (ERROR);
 	}
 	result = execute_child_process(mini, cmd_idx, cmd_path);
-	free(cmd_path);
-	mini->commands[cmd_idx].args = NULL;
+	if (is_allocated)
+		free(cmd_path);
 	return (result);
 }

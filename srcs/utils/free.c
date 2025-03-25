@@ -19,7 +19,7 @@ void	free_string_array(char **array)
 	if (!array)
 		return ;
 	i = 0;
-	while (array[i] != NULL)
+	while (array[i])
 	{
 		free(array[i]);
 		i++;
@@ -67,13 +67,16 @@ void	free_commands(t_mini *mini)
 {
 	int	i;
 
-	if (!mini->commands)
+	if (!mini || !mini->commands)
 		return ;
 	i = 0;
 	while (i < mini->num_commands)
 	{
 		if (mini->commands[i].args)
+		{
 			free_string_array(mini->commands[i].args);
+			mini->commands[i].args = NULL;
+		}
 		free_redirections(&mini->commands[i]);
 		if (mini->commands[i].fd_in != STDIN_FILENO)
 			close(mini->commands[i].fd_in);

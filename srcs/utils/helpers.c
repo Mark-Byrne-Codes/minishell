@@ -62,27 +62,31 @@ char	*join_and_free(char *s1, char *s2)
 	return (result);
 }
 
-int	add_argument(t_command *cmd, char *arg, int arg_idx)
+int	add_argument(t_command *cmd, char *arg, int idx)
 {
 	char	**new_args;
+	char	**old_args;
 	int		i;
 
-	new_args = malloc(sizeof(char *) * (arg_idx + 2));
+	new_args = malloc(sizeof(char *) * (idx + 2));
 	if (!new_args)
 		return (ERROR);
 	i = 0;
-	while (i < arg_idx)
+	while (i < idx)
 	{
 		new_args[i] = cmd->args[i];
 		i++;
 	}
-	new_args[arg_idx] = ft_strdup(arg);
-	if (!new_args[arg_idx])
+	new_args[idx] = ft_strdup(arg);
+	if (!new_args[idx])
 	{
 		free(new_args);
 		return (ERROR);
 	}
-	new_args[arg_idx + 1] = NULL;
+	new_args[idx + 1] = NULL;
+	old_args = cmd->args;
 	cmd->args = new_args;
+	if (idx > 0)
+		free(old_args);
 	return (SUCCESS);
 }

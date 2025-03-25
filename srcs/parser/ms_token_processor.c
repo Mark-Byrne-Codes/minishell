@@ -15,26 +15,25 @@
 int	handle_word_var(t_mini *mini, t_command *cmd, t_token *data, int *idx)
 {
 	char	*exp;
-	int		added;
+	int		result;
 
-	added = 0;
 	exp = expand_token(mini, data);
 	if (!exp)
 		return (ERROR);
+	result = SUCCESS;
 	if (exp[0] || *idx > 0)
 	{
 		if (add_argument(cmd, exp, *idx) == ERROR)
+			result = ERROR;
+		else
 		{
-			free(exp);
-			return (ERROR);
+			if (*idx == 0 && data->token == TOKEN_WORD && is_builtin(exp))
+				cmd->is_builtin = 1;
+			(*idx)++;
 		}
-		added = 1;
-		if (*idx == 0 && data->token == TOKEN_WORD && is_builtin(exp))
-			cmd->is_builtin = 1;
-		(*idx)++;
 	}
 	free(exp);
-	return (SUCCESS);
+	return (result);
 }
 
 int	handle_single_quote(t_command *cmd, t_token *data, int *idx)

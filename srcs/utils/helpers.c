@@ -83,7 +83,6 @@ int	add_argument(t_command *cmd, char *arg, int arg_idx)
 		return (ERROR);
 	}
 	new_args[arg_idx + 1] = NULL;
-	free(cmd->args);
 	cmd->args = new_args;
 	return (SUCCESS);
 }

@@ -88,11 +88,3 @@ void	free_commands(t_mini *mini)
 	free(mini->commands);
 	mini->commands = NULL;
 }
-
-void	free_token(t_token *token)
-{
-	if (!token)
-		return ;
-	free(token->string);
-	free(token);
-}

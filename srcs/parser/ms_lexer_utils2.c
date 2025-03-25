@@ -10,6 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "../../includes/minishell.h"
+
 /*
  * Checks if a character is either a single or double quote.
  * Param: char
@@ -22,4 +24,27 @@ int	fun_check_any_quote(unsigned int c)
 	else if (c == 34)
 		return (2);
 	return (0);
+}
+
+
+/* Free a single token */
+void	free_token(void *content)
+{
+	t_token	*token;
+
+	token = (t_token *)content;
+	if (!token)
+		return;
+	if (token->string)
+		free(token->string);
+	free(token);
+}
+
+/* Complete lexer cleanup */
+void	cleanup_lexer(t_lexer *lexer)
+{
+	if (!lexer)
+		return;
+	if (lexer->dictionary)
+		ft_lstclear(&lexer->dictionary, free_token);
 }

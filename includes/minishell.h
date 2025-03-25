@@ -207,12 +207,13 @@ void	fun_flag_flipper(int *flag);
 int		fun_check_ifs(unsigned int c);
 void	unfun_add_entry_fail(t_lexer *lexer, int end);
 int		fun_check_any_quote(unsigned int c);
+void	cleanup_lexer(t_lexer *lexer);
 
 // Token Expansion
 char	*expand_token(t_mini *mini, t_token *token);
 char	*expand_variables(t_mini *mini, char *str, int in_quotes);
 char	*expand_tilde(t_mini *mini, char *str);
-void	free_token(t_token *token);
+void	free_token(void *content);
 
 // Token Handling
 int		ms_handle_redirection(t_mini *mini, t_command *cmd, t_list **temp);

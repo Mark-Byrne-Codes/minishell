@@ -33,8 +33,7 @@ int	handle_word_var(t_mini *mini, t_command *cmd, t_token *data, int *idx)
 			cmd->is_builtin = 1;
 		(*idx)++;
 	}
-	if (!added)
-		free(exp);
+	free(exp);
 	return (SUCCESS);
 }
 
@@ -77,17 +76,17 @@ int	concat_adjacent_strings(t_lexer *lexer)
 {
 	t_list	*tmp;
 	t_token	*data;
-	t_token	*next;
+	t_token	*nx;
 
 	tmp = lexer->dictionary;
 	while (tmp && tmp->next)
 	{
 		data = (t_token *)tmp->content;
-		next = (t_token *)tmp->next->content;
+		nx = (t_token *)tmp->next->content;
 		if ((data->token == TOKEN_WORD || data->token == TOKEN_SINGLE_Q_STRING)
-			&& (next->token == TOKEN_WORD || next->token == TOKEN_SINGLE_Q_STRING))
+			&& (nx->token == TOKEN_WORD || nx->token == TOKEN_SINGLE_Q_STRING))
 		{
-			if (concat_tokens(data, next, tmp, tmp->next) == ERROR)
+			if (concat_tokens(data, nx, tmp, tmp->next) == ERROR)
 				return (ERROR);
 		}
 		else

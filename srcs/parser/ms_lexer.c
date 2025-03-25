@@ -87,13 +87,19 @@ static void	fun_fill_dictionary(t_lexer *lexer, char *command)
  * Main parsing function
  * Initializes lexer, fills dictionary, and processes tokens
  */
-int	parse_line(t_lexer *lexer, char *command, t_mini *mini)
-{
-	fun_lex_struct_init(lexer);
-	fun_fill_dictionary(lexer, command);
-	if (init_commands(mini, lexer->pipes + 1) == ERROR)
-		return (ERROR);
-	if (ms_process_tokens(mini, lexer) == ERROR)
-		return (ERROR);
-	return (SUCCESS);
-}
+ int	parse_line(t_lexer *lexer, char *command, t_mini *mini)
+ {
+	 int	ret;
+ 
+	 fun_lex_struct_init(lexer);
+	 fun_fill_dictionary(lexer, command);
+	 ret = init_commands(mini, lexer->pipes + 1);
+	 if (ret == ERROR)
+	 {
+		 cleanup_lexer(lexer);
+		 return (ERROR);
+	 }
+	 ret = ms_process_tokens(mini, lexer);
+	 cleanup_lexer(lexer);
+	 return (ret);
+ }

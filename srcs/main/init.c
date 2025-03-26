@@ -66,7 +66,7 @@ int	init_mini(t_mini *mini, char **envp)
 	mini->envp = envp;
 	mini->exit_status = 0;
 	mini->should_exit = 0;
-	setup_signal_handlers(mini);
+	setup_signal_handlers();
 	return (0);
 }
 
@@ -78,7 +78,7 @@ int	init_mini(t_mini *mini, char **envp)
  * @note Resets all state flags to 0 and initializes the dictionary to NULL.
  * This prepares the lexer for a new parsing operation.
  */
-void	fun_lex_struct_init(t_lexer *lexer)
+void	init_lexer(t_lexer *lexer)
 {
 	lexer->squote = 0;
 	lexer->dquote = 0;

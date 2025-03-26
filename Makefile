@@ -41,21 +41,21 @@ SRCS_UTILS = srcs/utils/free.c \
 SRCS_ENV = srcs/env/env.c \
 				srcs/env/env_utils.c
 
-SRCS_EXEC = 	srcs/execution/exec_cmds.c \
-				srcs/execution/exec_redirects.c \
-				srcs/execution/exec_pipes.c \
-				srcs/execution/exec_process.c \
-				srcs/execution/exec_path.c \
-				srcs/execution/exec_external.c \
-				srcs/execution/exec_heredoc.c
+SRCS_EXEC = 	srcs/execution/command_exec.c \
+				srcs/execution/redirection.c \
+				srcs/execution/pipes.c \
+				srcs/execution/process_control.c \
+				srcs/execution/path.c \
+				srcs/execution/external_command_exec.c \
+				srcs/execution/heredoc.c
  
-SRCS_PARSE = srcs/parser/ms_lexer_utils.c \
-					srcs/parser/ms_lexer.c \
-					srcs/parser/ms_lexer_tokens.c \
-					srcs/parser/ms_expand.c \
-					srcs/parser/ms_expand_var.c \
-					srcs/parser/ms_parser.c \
-					srcs/parser/ms_token_processor.c \
+SRCS_PARSE = srcs/parser/lexer_utils.c \
+					srcs/parser/lexer.c \
+					srcs/parser/token_types.c \
+					srcs/parser/token_expansion.c \
+					srcs/parser/variable_expansion.c \
+					srcs/parser/command_parser.c \
+					srcs/parser/token_processor.c \
 
 
 SRCS = $(SRCS_MAIN) $(SRCS_ENV) $(SRCS_UTILS) $(SRCS_BUILTINS) $(SRCS_EXEC) $(SRCS_PARSE)

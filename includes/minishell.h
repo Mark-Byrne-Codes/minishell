@@ -173,7 +173,11 @@ void	free_commands(t_mini *mini);
 // Error Handling & Signal Handling
 int		handle_file_open_error(t_command *cmd, char *filename);
 void	clean_exit(t_mini *mini);
-void	setup_signal_handlers(t_mini *mini);
+void	setup_signal_handlers();
+void	signal_handler_heredoc(int signum);
+void	setup_heredoc_signals(void);
+void	restore_default_signals();
+void	signal_handler_interactive(int signum);
 
 // Prompt & Variable Expansion
 char	*get_prompt(void);
@@ -181,18 +185,17 @@ char	*expand_exit_status(t_mini *mini);
 char	*expand_env_var(t_mini *mini, const char *var_name);
 
 // Lexer Functions
-void	*fun_charwise(t_lexer *lexer, char *command);
 int		parse_line(t_lexer *lexer, char *command, t_mini *mini);
-void	*fun_variable_string(t_lexer *lexer, char *cmd);
-void	*fun_word_string(t_lexer *lexer, char *cmd);
-void	*fun_double_quote_string(t_lexer *lexer, char *command);
-void	*fun_single_quote_string(t_lexer *lexer, char *command);
-void	fun_lex_struct_init(t_lexer *lexer);
-void	*fun_add_entry(t_lexer *lexer, char *str, int len, t_token_type token);
-void	fun_flag_flipper(int *flag);
-int		fun_check_ifs(unsigned int c);
-void	unfun_add_entry_fail(t_lexer *lexer, int end);
-int		fun_check_any_quote(unsigned int c);
+void	*handle_variable_token(t_lexer *lexer, char *cmd);
+void	*handle_word_token(t_lexer *lexer, char *cmd);
+void	*handle_double_quoted_string(t_lexer *lexer, char *command);
+void	*handle_single_quoted_string(t_lexer *lexer, char *command);
+void	init_lexer(t_lexer *lexer);
+void	*add_token_to_list(t_lexer *lexer, char *str, int len, t_token_type token);
+void	toggle_quote_state(int *flag);
+int		is_whitespace_character(unsigned int c);
+void	cleanup_on_token_error(t_lexer *lexer, int end);
+int		is_quote_character(unsigned int c);
 void	cleanup_lexer(t_lexer *lexer);
 
 // Token Expansion

@@ -107,3 +107,18 @@ void	restore_io(int saved_stdin, int saved_stdout)
 		close(saved_stdout);
 	}
 }
+
+/**
+ * @brief Checks if a character is a quote character
+ * 
+ * @param c Character to check
+ * @return int 0 if not a quote, 1 if single quote, 2 if double quote
+ */
+int	is_quote_character(unsigned int c)
+{
+	if (c == 39)
+		return (1);
+	else if (c == 34)
+		return (2);
+	return (0);
+}

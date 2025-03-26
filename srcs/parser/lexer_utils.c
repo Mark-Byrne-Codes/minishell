@@ -19,7 +19,8 @@
  * Params: lexer, *string, len, token
  * Returns: nothing yet
  */
-void	*fun_add_entry(t_lexer *lexer, char *str, int len, t_token_type token)
+void	*add_token_to_list(t_lexer *lexer, char *str, int len,
+		t_token_type token)
 {
 	char	*new_string;
 	t_token	*new_token;
@@ -27,12 +28,12 @@ void	*fun_add_entry(t_lexer *lexer, char *str, int len, t_token_type token)
 
 	new_string = ft_substr(str, 0, len);
 	if (!new_string)
-		unfun_add_entry_fail(lexer, 1);
+		cleanup_on_token_error(lexer, 1);
 	new_token = malloc(sizeof(t_token));
 	if (!new_token)
 	{
 		free(new_string);
-		unfun_add_entry_fail(lexer, 1);
+		cleanup_on_token_error(lexer, 1);
 	}
 	new_token->token = token;
 	new_token->string = new_string;
@@ -41,7 +42,7 @@ void	*fun_add_entry(t_lexer *lexer, char *str, int len, t_token_type token)
 	if (!new_node)
 	{
 		free_token(new_token);
-		unfun_add_entry_fail(lexer, 1);
+		cleanup_on_token_error(lexer, 1);
 	}
 	ft_lstadd_back(&lexer->dictionary, new_node);
 	return (str + len);
@@ -51,7 +52,7 @@ void	*fun_add_entry(t_lexer *lexer, char *str, int len, t_token_type token)
  * Changes the value of a flag. Ghetto bool for stick in the muds.
  * Params: flag
  */
-void	fun_flag_flipper(int *flag)
+void	toggle_quote_state(int *flag)
 {
 	if (*flag == 0)
 		*flag = 1;
@@ -65,7 +66,7 @@ void	fun_flag_flipper(int *flag)
  * Param: char
  * Return: 0 if not, 1 if
  */
-int	fun_check_ifs(unsigned int c)
+int	is_whitespace_character(unsigned int c)
 {
 	if (c == ' ' || c == 9 || c == 10)
 		return (1);
@@ -78,10 +79,10 @@ int	fun_check_ifs(unsigned int c)
  * the list. Exits with failure code.
  * params: *lexer, end flag (1 to exit fail, 0 to not)
  */
-void	unfun_add_entry_fail(t_lexer *lexer, int end)
+void	cleanup_on_token_error(t_lexer *lexer, int end)
 {
-	t_list *temp;
-	t_token *token;
+	t_list	*temp;
+	t_token	*token;
 
 	temp = lexer->dictionary;
 	while (temp != NULL)

@@ -6,11 +6,13 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/23 15:39:26 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/24 13:01:19 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/26 09:03:16 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
+
+int g_exit_status = 0;
 
 static int	init_mini(t_mini *mini, char **envp)
 {

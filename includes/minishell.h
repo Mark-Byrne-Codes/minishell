@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/23 15:14:33 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/24 11:27:17 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/26 09:03:01 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,8 @@
 # include <linux/limits.h>
 # include "../libft/libft.h"
 # include <stdbool.h>
+
+extern int	g_exit_status;
 
 typedef enum e_token_type
 {

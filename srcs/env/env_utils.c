@@ -6,13 +6,22 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 11:28:22 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/23 13:45:57 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/26 15:58:20 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 
-// Helper function to process a single environment variable string.
+/**
+ * @brief Creates an env node from a "NAME=value" string
+ * 
+ * @param env_str Environment string to parse
+ * @return t_env* New node or NULL on failure
+ * 
+ * @note Splits string at first '=' character
+ * Allocates memory for both name and value
+ * Caller must free the node using free_env_list()
+ */
 static t_env	*create_env_node_from_string(char *env_str)
 {
 	char	*equals;
@@ -38,7 +47,12 @@ static t_env	*create_env_node_from_string(char *env_str)
 	return (new_node);
 }
 
-//Counts the amount of nodes in the linked list
+/**
+ * @brief Counts nodes in environment list
+ * 
+ * @param head List head pointer
+ * @return int Number of nodes
+ */
 static int	count_nodes(t_env *head)
 {
 	int	count;
@@ -52,7 +66,15 @@ static int	count_nodes(t_env *head)
 	return (count);
 }
 
-// Copies the environment variables from envp into a linked list.
+/**
+ * @brief Converts envp array to linked list
+ * 
+ * @param envp NULL-terminated array of "NAME=value" strings
+ * @return t_env* Head of new list or NULL on failure
+ * 
+ * @note Creates a deep copy of all environment variables
+ * On failure, frees any partially created list
+ */
 t_env	*copy_env(char **envp)
 {
 	t_env	*head;
@@ -72,7 +94,15 @@ t_env	*copy_env(char **envp)
 	return (head);
 }
 
-// Converts the environment linked list to a NULL-terminated array of strings.
+/**
+ * @brief Converts env list to string array
+ * 
+ * @param head List head pointer
+ * @return char** NULL-terminated array of "NAME=value" strings
+ * 
+ * @note Allocates new memory for the array and strings
+ * Returns NULL on allocation failure after freeing partial results
+ */
 char	**env_list_to_array(t_env *head)
 {
 	char	**env_array;
@@ -101,7 +131,16 @@ char	**env_list_to_array(t_env *head)
 	return (env_array);
 }
 
-// Removes an environment variable from the list by its name.
+/**
+ * @brief Removes node from environment list
+ * 
+ * @param head Pointer to list head pointer
+ * @param name Name of variable to remove
+ * 
+ * @note If variable not found, does nothing
+ * Properly handles removal of head node
+ * Frees all memory associated with removed node
+ */
 void	remove_env_node(t_env **head, char *name)
 {
 	t_env	*current;

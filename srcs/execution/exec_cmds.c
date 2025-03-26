@@ -1,17 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ms_exec_cmds.c                                     :+:      :+:    :+:   */
+/*   exec_cmds.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/12 11:16:34 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/23 14:46:43 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/26 10:16:08 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 
+/**
+ * Saves the current standard input and output file descriptors
+ * 
+ * param saved_stdin Pointer to store the saved stdin fd
+ * param saved_stdout Pointer to store the saved stdout fd
+ * return int Returns SUCCESS on success, ERROR on failure
+ */
 static int	setup_io(int *saved_stdin, int *saved_stdout)
 {
 	*saved_stdin = dup(STDIN_FILENO);
@@ -21,6 +28,13 @@ static int	setup_io(int *saved_stdin, int *saved_stdout)
 	return (SUCCESS);
 }
 
+/**
+ *Sets up pipe redirections for the current command
+ * 
+ * param mini Pointer to the main minishell structure
+ * param i Index of the current command
+ * return int Returns SUCCESS on success, ERROR on failure
+ */
 static int	handle_pipe_setup(t_mini *mini, int i)
 {
 	if (i < mini->num_commands - 1)
@@ -38,6 +52,11 @@ static int	handle_pipe_setup(t_mini *mini, int i)
 	return (SUCCESS);
 }
 
+/**
+ * Closes all file descriptors associated with a command
+ * 
+ * param cmd Pointer to the command structure
+ */
 static void	close_fds(t_command *cmd)
 {
 	if (cmd->pipe_write != -1)
@@ -62,6 +81,15 @@ static void	close_fds(t_command *cmd)
 	}
 }
 
+/**
+ * Prepares a command for execution by setting up I/O and pipes
+ * 
+ * param mini Pointer to the main minishell structure
+ * param i Index of the current command
+ * param saved_stdin Pointer to store the saved stdin fd
+ * param saved_stdout Pointer to store the saved stdout fd
+ * return int Returns SUCCESS on success, ERROR on failure
+ */
 static int	prepare_command(t_mini *mini, int i,
 			int *saved_stdin, int *saved_stdout)
 {
@@ -82,6 +110,12 @@ static int	prepare_command(t_mini *mini, int i,
 	return (SUCCESS);
 }
 
+/**
+ * Executes all commands in the pipeline
+ * 
+ * param mini Pointer to the main minishell structure
+ * return int Returns the exit status of the last command executed
+ */
 int	execute_commands(t_mini *mini)
 {
 	int	i;

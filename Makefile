@@ -19,7 +19,10 @@ LIBFT = $(LIBFT_DIR)/libft.a
 INCLUDES = -Iincludes -I$(LIBFT_DIR)/includes
 
 
-SRCS_MAIN = srcs/main.c
+SRCS_MAIN = srcs/main/main.c \
+			srcs/main/prompt.c \
+			srcs/main/signals.c \
+			srcs/main/init.c \
 
 SRCS_BUILTINS = srcs/builtins/exit_builtin.c \
 				srcs/builtins/echo_builtin.c \
@@ -33,28 +36,24 @@ SRCS_BUILTINS = srcs/builtins/exit_builtin.c \
 
 SRCS_UTILS = srcs/utils/free.c \
 				srcs/utils/helpers.c \
-				srcs/utils/prompt.c \
 				srcs/utils/error.c \
 
-SRCS_ENV = srcs/env/env_list.c \
+SRCS_ENV = srcs/env/env.c \
 				srcs/env/env_utils.c
 
-SRCS_EXEC = srcs/utils/signals.c \
-				srcs/execution/ms_exec_cmds.c \
-				srcs/execution/ms_exec_redirects.c \
-				srcs/execution/ms_exec_pipes.c \
-				srcs/execution/ms_exec_utils.c \
-				srcs/execution/ms_exec_utils_2.c \
-				srcs/execution/ms_exec_external.c \
-				srcs/execution/ms_exec_heredoc.c
+SRCS_EXEC = 	srcs/execution/exec_cmds.c \
+				srcs/execution/exec_redirects.c \
+				srcs/execution/exec_pipes.c \
+				srcs/execution/exec_process.c \
+				srcs/execution/exec_path.c \
+				srcs/execution/exec_external.c \
+				srcs/execution/exec_heredoc.c
  
 SRCS_PARSE = srcs/parser/ms_lexer_utils.c \
-					srcs/parser/ms_lexer_utils2.c \
 					srcs/parser/ms_lexer.c \
 					srcs/parser/ms_lexer_tokens.c \
 					srcs/parser/ms_expand.c \
-					srcs/parser/ms_parser_utils.c \
-					srcs/parser/ms_expand_utils.c \
+					srcs/parser/ms_expand_var.c \
 					srcs/parser/ms_parser.c \
 					srcs/parser/ms_token_processor.c \
 

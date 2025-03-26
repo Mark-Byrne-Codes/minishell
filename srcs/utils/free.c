@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 11:29:15 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/23 14:49:19 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/26 11:17:41 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,23 +27,17 @@ void	free_string_array(char **array)
 	free(array);
 }
 
-void	free_tokens(t_mini *mini)
+/* Free a single token */
+void	free_token(void *content)
 {
-	int	i;
+	t_token	*token;
 
-	if (mini->tokens)
-	{
-		i = 0;
-		while (i < mini->num_tokens)
-		{
-			free(mini->tokens[i].string);
-			mini->tokens[i].string = NULL;
-			i++;
-		}
-		free(mini->tokens);
-		mini->tokens = NULL;
-		mini->num_tokens = 0;
-	}
+	token = (t_token *)content;
+	if (!token)
+		return ;
+	if (token->string)
+		free(token->string);
+	free(token);
 }
 
 void	free_redirections(t_command *cmd)

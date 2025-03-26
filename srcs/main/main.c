@@ -6,28 +6,13 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/23 15:39:26 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/26 09:03:16 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/26 11:16:57 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-int g_exit_status = 0;
-
-static int	init_mini(t_mini *mini, char **envp)
-{
-	mini->env = copy_env(envp);
-	if (!mini->env)
-		return (1);
-	mini->envp = envp;
-	mini->exit_status = 0;
-	mini->fd_in = 0;
-	mini->fd_out = 1;
-	mini->should_exit = 0;
-	mini->is_builtin = 0;
-	setup_signal_handlers(mini);
-	return (0);
-}
+int	g_exit_status = 0;
 
 int	parse_and_execute(char *line, t_mini *mini, t_lexer *lex_data)
 {
@@ -45,13 +30,11 @@ int	parse_and_execute(char *line, t_mini *mini, t_lexer *lex_data)
 	if (mini->num_commands > 0 && execute_commands(mini) == ERROR)
 	{
 		free_commands(mini);
-		free_tokens(mini);
 		free(lex_data);
 		mini->exit_status = ERROR;
 		return (ERROR);
 	}
 	free_commands(mini);
-	free_tokens(mini);
 	free(lex_data);
 	return (SUCCESS);
 }

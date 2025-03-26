@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 15:09:57 by elehtone          #+#    #+#             */
-/*   Updated: 2025/03/24 09:02:19 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/26 12:14:19 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,7 @@ static void	fun_fill_dictionary(t_lexer *lexer, char *command)
 		 cleanup_lexer(lexer);
 		 return (ERROR);
 	 }
-	 ret = ms_process_tokens(mini, lexer);
+	 ret = process_tokens(mini, lexer);
 	 cleanup_lexer(lexer);
 	 return (ret);
  }

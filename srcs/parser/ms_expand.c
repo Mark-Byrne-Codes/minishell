@@ -6,22 +6,26 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:59:13 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/24 13:24:27 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/26 12:04:56 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 
-static char	*init_result(void)
-{
-	char	*result;
-
-	result = ft_strdup("");
-	if (!result)
-		return (NULL);
-	return (result);
-}
-
+/**
+ * @brief Determines if a variable should be expanded at current position
+ * 
+ * @param str Input string being processed
+ * @param i Current position in string
+ * @param in_quotes Quote state (0=none, 1=single, 2=double)
+ * @return int 1 if should expand, 0 otherwise
+ * 
+ * @note Special cases:
+ * - No expansion in single quotes
+ * - Expands $? (exit status)
+ * - Expands valid variable names (alnum + underscore)
+ * - Expands $" in double quotes
+ */
 static int	should_expand_variable(char *str, int i, int in_quotes)
 {
 	if (in_quotes == 1)
@@ -36,6 +40,22 @@ static int	should_expand_variable(char *str, int i, int in_quotes)
 	return (0);
 }
 
+/**
+ * @brief Handles the actual variable expansion process
+ * 
+ * @param mini Minishell context
+ * @param str Original input string
+ * @param res Result string being built
+ * @param i Current position in string
+ * @return int New position after expansion or -1 on error
+ * 
+ * @note Steps:
+ * 1. Extracts variable name
+ * 2. Gets variable value from environment
+ * 3. Appends value to result
+ * 4. Handles special $? case
+ * 5. Returns updated position
+ */
 static int	handle_variable_expansion(t_mini *mini, char *str,
 				char **res, int i)
 {
@@ -59,6 +79,16 @@ static int	handle_variable_expansion(t_mini *mini, char *str,
 	return (i + name_len + 1);
 }
 
+/**
+ * @brief Appends a single character to the result string
+ * 
+ * @param result Pointer to result string
+ * @param c Character to append
+ * @return int 1 on success, 0 on memory failure
+ * 
+ * @note Handles memory allocation and copying safely
+ * Frees old result buffer on reallocation
+ */
 static int	append_char(char **result, char c)
 {
 	char	*temp;
@@ -85,12 +115,25 @@ static int	append_char(char **result, char c)
 	return (1);
 }
 
+/**
+ * @brief Main variable expansion function
+ * 
+ * @param mini Minishell context
+ * @param str Input string to expand
+ * @param in_quotes Current quote state
+ * @return char* Expanded string or NULL on error
+ * 
+ * @note Processes string character by character:
+ * - Expands variables when appropriate
+ * - Preserves other characters
+ * - Handles memory allocation and cleanup
+ */
 char	*expand_variables(t_mini *mini, char *str, int in_quotes)
 {
 	char	*result;
 	int		i;
 
-	result = init_result();
+	result = ft_strdup("");
 	if (!result)
 		return (NULL);
 	i = 0;

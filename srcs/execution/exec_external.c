@@ -1,17 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ms_exec_external.c                                 :+:      :+:    :+:   */
+/*   exec_external.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/23 14:55:49 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/24 13:32:49 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/26 12:32:22 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 
+/**
+ * @brief Handles the case when a command is not found
+ * 
+ * @param mini Pointer to the main minishell structure
+ * @param cmd_idx Index of the command that wasn't found
+ * @return int Returns 127 (standard "command not found" exit status)
+ * 
+ * @note Prints appropriate error messages depending on whether the command
+ * contained a path separator or not.
+ */
 static int	handle_command_not_found(t_mini *mini, int cmd_idx)
 {
 	if (cmd_idx == 0 || mini->num_commands == 1)
@@ -27,6 +37,16 @@ static int	handle_command_not_found(t_mini *mini, int cmd_idx)
 	return (127);
 }
 
+/**
+ * @brief Handles errors that occur during command execution
+ * 
+ * @param mini Pointer to the main minishell structure
+ * @param cmd_idx Index of the command that failed
+ * @return int Returns appropriate exit status (126 or 127)
+ * 
+ * @note Special case for directories returns 126 if trying to execute a dir.
+ * Distinguishes between "not found" (127) and other errors (126).
+ */
 static int	handle_execution_error(t_mini *mini, int cmd_idx)
 {
 	struct stat	file_stat;
@@ -56,6 +76,15 @@ static int	handle_execution_error(t_mini *mini, int cmd_idx)
 	return (mini->exit_status);
 }
 
+/**
+ * @brief Closes all pipes that aren't needed by the current command
+ * 
+ * @param mini Pointer to the main minishell structure
+ * @param cmd_idx Index of the current command
+ * 
+ * @note This prevents pipe leaks in child processes and ensures proper
+ * cleanup of file descriptors.
+ */
 static void	close_other_pipes(t_mini *mini, int cmd_idx)
 {
 	int	i;
@@ -75,6 +104,17 @@ static void	close_other_pipes(t_mini *mini, int cmd_idx)
 	}
 }
 
+/**
+ * @brief Executes a command in a child process
+ * 
+ * @param mini Pointer to the main minishell structure
+ * @param cmd_idx Index of the command to execute
+ * @param cmd_path Full path to the command executable
+ * @return int Returns SUCCESS on successful fork, ERROR on failure
+ * 
+ * @note Handles both builtin and external commands. For external commands,
+ * it sets up the environment array and executes via execve.
+ */
 static int	execute_child_process(t_mini *mini, int cmd_idx, char *cmd_path)
 {
 	pid_t	pid;
@@ -104,6 +144,16 @@ static int	execute_child_process(t_mini *mini, int cmd_idx, char *cmd_path)
 	return (SUCCESS);
 }
 
+/**
+ * @brief Launches an external command or builtin
+ * 
+ * @param mini Pointer to the main minishell structure
+ * @param cmd_idx Index of the command to launch
+ * @return int Returns SUCCESS on success, ERROR on failure
+ * 
+ * @note Handles command path resolution, memory management for command paths,
+ * and error cases before execution.
+ */
 int	launch_external(t_mini *mini, int cmd_idx)
 {
 	char	*cmd_path;

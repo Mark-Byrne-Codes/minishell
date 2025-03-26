@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/23 13:48:06 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/23 14:54:55 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/26 11:17:29 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,31 +62,48 @@ char	*join_and_free(char *s1, char *s2)
 	return (result);
 }
 
-int	add_argument(t_command *cmd, char *arg, int idx)
+char	*remove_quotes(const char *str)
 {
-	char	**new_args;
-	char	**old_args;
 	int		i;
+	int		j;
+	char	*result;
+	int		in_quote[2];
 
-	new_args = malloc(sizeof(char *) * (idx + 2));
-	if (!new_args)
-		return (ERROR);
+	result = malloc(ft_strlen(str) + 1);
+	if (!result)
+		return (NULL);
 	i = 0;
-	while (i < idx)
+	j = 0;
+	in_quote[0] = 0;
+	in_quote[1] = 0;
+	while (str[i])
 	{
-		new_args[i] = cmd->args[i];
+		if (str[i] == '\'' && !in_quote[1])
+			in_quote[0] = !in_quote[0];
+		else if (str[i] == '"' && !in_quote[0])
+			in_quote[1] = !in_quote[1];
+		else
+			result[j++] = str[i];
 		i++;
 	}
-	new_args[idx] = ft_strdup(arg);
-	if (!new_args[idx])
+	result[j] = '\0';
+	return (result);
+}
+
+/**
+ * Restores the original file descriptors
+ * Used after command execution to restore the shell's I/O
+ */
+void	restore_io(int saved_stdin, int saved_stdout)
+{
+	if (saved_stdin != STDIN_FILENO)
 	{
-		free(new_args);
-		return (ERROR);
+		dup2(saved_stdin, STDIN_FILENO);
+		close(saved_stdin);
 	}
-	new_args[idx + 1] = NULL;
-	old_args = cmd->args;
-	cmd->args = new_args;
-	if (idx > 0)
-		free(old_args);
-	return (SUCCESS);
+	if (saved_stdout != STDOUT_FILENO)
+	{
+		dup2(saved_stdout, STDOUT_FILENO);
+		close(saved_stdout);
+	}
 }

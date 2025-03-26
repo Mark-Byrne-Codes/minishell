@@ -6,12 +6,21 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 10:24:18 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/23 13:24:32 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/26 15:57:36 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 
+/**
+ * @brief Checks if a string represents a valid numeric value.
+ * 
+ * Validates that the string contains only digits, optional sign (+/-),
+ * and optional quotes surrounding the number. At least one digit must be there.
+ * 
+ * @param str The string to validate
+ * @return int 1 if the string is numeric, 0 otherwise
+ */
 static int	is_numeric(const char *str)
 {
 	int	i;
@@ -35,6 +44,16 @@ static int	is_numeric(const char *str)
 	return (str[i] == '\0' && has_digits);
 }
 
+/**
+ * @brief Converts a string to a long long number with overflow detection.
+ * 
+ * Handles optional sign and quotes, converts the numeric portion to a number,
+ * and detects overflow conditions during conversion.
+ * 
+ * @param str The string to convert
+ * @param overflow Pointer to store overflow status (1 if overflow occurred)
+ * @return long long The converted number (undefined if overflow occurred)
+ */
 static long long	convert_to_number(const char *str, int *overflow)
 {
 	long long	result;
@@ -63,6 +82,18 @@ static long long	convert_to_number(const char *str, int *overflow)
 	return (result * sign);
 }
 
+/**
+ * @brief Handles exit command error cases.
+ * 
+ * Sets appropriate error messages and exit status for different failure cases:
+ * 1. Too many arguments
+ * 2. Non-numeric argument
+ * 
+ * @param mini Pointer to minishell structure
+ * @param error_type Type of error (1 for too many args, 2 for non-numeric)
+ * @param arg The problematic argument (used for error message)
+ * @return int Always returns 0 (consistent with shell exit behavior)
+ */
 static int	handle_exit_error(t_mini *mini, int error_type, char *arg)
 {
 	if (error_type == 1)
@@ -80,6 +111,17 @@ static int	handle_exit_error(t_mini *mini, int error_type, char *arg)
 	return (0);
 }
 
+/**
+ * @brief Implements the exit builtin command.
+ * 
+ * Handles shell exit with optional status code. Validates arguments and sets:
+ * - Exit status (0 if no argument, 1 for too many args, 2 for invalid number)
+ * - should_exit flag to terminate the shell
+ * 
+ * @param mini Pointer to minishell structure
+ * @param args Command arguments (args[0] is "exit", args[1] is optional status)
+ * @return int Always returns 0 (exit happens through mini->should_exit)
+ */
 int	exit_builtin(t_mini *mini, char **args)
 {
 	int			arg_count;

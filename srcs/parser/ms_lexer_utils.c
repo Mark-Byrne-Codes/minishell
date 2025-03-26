@@ -6,29 +6,11 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/09 23:17:17 by elehtone          #+#    #+#             */
-/*   Updated: 2025/03/23 14:20:22 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/26 11:35:25 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
-
-/*
- * Initialise the lexer struct with default values of 0.
- * Initialise the dictionary list node to NULL.
- * Params: lexer
- */
-void	fun_lex_struct_init(t_lexer *lexer)
-{
-	lexer->squote = 0;
-	lexer->dquote = 0;
-	lexer->pipes = 0;
-	lexer->vars = 0;
-	lexer->red_in = 0;
-	lexer->red_delim = 0;
-	lexer->red_out = 0;
-	lexer->red_append = 0;
-	lexer->dictionary = NULL;
-}
 
 /*
  * Adds a new entry to the dictionary. Creates pointers to a new token and node
@@ -100,7 +82,7 @@ void	unfun_add_entry_fail(t_lexer *lexer, int end)
 {
 	t_list *temp;
 	t_token *token;
-	
+
 	temp = lexer->dictionary;
 	while (temp != NULL)
 	{

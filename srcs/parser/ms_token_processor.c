@@ -6,12 +6,68 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 15:30:12 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/24 15:45:51 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/26 11:16:36 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 
+/**
+ * @brief Adds an argument to a command's argument array
+ * 
+ * @param cmd Command structure to modify
+ * @param arg Argument string to add
+ * @param idx Current argument count
+ * @return int SUCCESS on success, ERROR on allocation failure
+ * 
+ * @note Dynamically expands the argument array and handles:
+ * - Memory allocation for new array
+ * - String duplication
+ * - Proper cleanup of old array
+ */
+int	add_argument(t_command *cmd, char *arg, int idx)
+{
+	char	**new_args;
+	char	**old_args;
+	int		i;
+
+	new_args = malloc(sizeof(char *) * (idx + 2));
+	if (!new_args)
+		return (ERROR);
+	i = 0;
+	while (i < idx)
+	{
+		new_args[i] = cmd->args[i];
+		i++;
+	}
+	new_args[idx] = ft_strdup(arg);
+	if (!new_args[idx])
+	{
+		free(new_args);
+		return (ERROR);
+	}
+	new_args[idx + 1] = NULL;
+	old_args = cmd->args;
+	cmd->args = new_args;
+	if (idx > 0)
+		free(old_args);
+	return (SUCCESS);
+}
+
+/**
+ * @brief Processes word and variable tokens
+ * 
+ * @param mini Minishell context
+ * @param cmd Command structure to modify
+ * @param data Token being processed
+ * @param idx Pointer to current argument index
+ * @return int SUCCESS on success, ERROR on failure
+ * 
+ * @note Handles both regular words and variables by:
+ * 1. Expanding variables if needed
+ * 2. Adding to command arguments
+ * 3. Checking for builtin commands
+ */
 int	handle_word_var(t_mini *mini, t_command *cmd, t_token *data, int *idx)
 {
 	char	*exp;
@@ -36,6 +92,19 @@ int	handle_word_var(t_mini *mini, t_command *cmd, t_token *data, int *idx)
 	return (result);
 }
 
+/**
+ * @brief Processes single-quoted string tokens
+ * 
+ * @param cmd Command structure to modify
+ * @param data Token being processed
+ * @param idx Pointer to current argument index
+ * @return int SUCCESS on success, ERROR on failure
+ * 
+ * @note Handles single-quoted strings by:
+ * 1. Preserving literal content
+ * 2. Adding to command arguments
+ * 3. Checking for builtin commands
+ */
 int	handle_single_quote(t_command *cmd, t_token *data, int *idx)
 {
 	char	*content;
@@ -55,6 +124,18 @@ int	handle_single_quote(t_command *cmd, t_token *data, int *idx)
 	return (SUCCESS);
 }
 
+/**
+ * @brief Concatenates two adjacent string tokens
+ * 
+ * @param d1 First token data
+ * @param d2 Second token data
+ * @param t1 First token list node
+ * @param t2 Second token list node
+ * @return int SUCCESS on success, ERROR on failure
+ * 
+ * @note Combines string content and maintains token list integrity
+ * Handles memory allocation and cleanup of merged tokens
+ */
 static int	concat_tokens(t_token *d1, t_token *d2, t_list *t1, t_list *t2)
 {
 	char	*new;
@@ -71,6 +152,17 @@ static int	concat_tokens(t_token *d1, t_token *d2, t_list *t1, t_list *t2)
 	return (SUCCESS);
 }
 
+/**
+ * @brief Concatenates adjacent string tokens in lexer dictionary
+ * 
+ * @param lexer Lexer containing token dictionary
+ * @return int SUCCESS on success, ERROR on failure
+ * 
+ * @note Scans token list and merges adjacent:
+ * - Word tokens
+ * - Single-quoted strings
+ * Preserves other token types unchanged
+ */
 int	concat_adjacent_strings(t_lexer *lexer)
 {
 	t_list	*tmp;

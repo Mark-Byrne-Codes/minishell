@@ -6,12 +6,21 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 09:47:16 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/23 12:03:09 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/26 15:57:14 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 
+/**
+ * @brief Implements the env builtin command.
+ * 
+ * Prints all environment variables in the format "NAME=value" for each variable
+ * that has a non-empty value. Variables with empty values are skipped.
+ * 
+ * @param mini Pointer to the main minishell structure containing the environment
+ * @return int Always returns 0 (success)
+ */
 int	env_builtin(t_mini *mini)
 {
 	t_env	*current;
@@ -31,6 +40,15 @@ int	env_builtin(t_mini *mini)
 	return (0);
 }
 
+/**
+ * @brief Prints environment variables in a format suitable for export.
+ * 
+ * Prints all environment variables in the format "declare -x NAME[=\"value\"]",
+ * which is compatible with bash's export command output format. 
+ * This is typically used by the export builtin when called with no arguments.
+ * 
+ * @param env Pointer to the head of the environment variables linked list
+ */
 void	print_env_vars(t_env *env)
 {
 	while (env)

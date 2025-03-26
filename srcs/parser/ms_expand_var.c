@@ -1,17 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ms_expand_utils.c                                  :+:      :+:    :+:   */
+/*   ms_expand_var.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:54:23 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/26 09:04:31 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/26 12:05:01 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 
+/**
+ * @brief Expands tilde (~) to home directory path
+ * 
+ * @param mini Minishell context
+ * @param str String containing potential tilde
+ * @return char* Expanded string or original if no expansion
+ * 
+ * @note Only expands:
+ * - Lone ~ to home directory
+ * - ~/ to home directory path prefix
+ * Preserves other cases unchanged
+ */
 char	*expand_tilde(t_mini *mini, char *str)
 {
 	char	*home_dir;
@@ -30,7 +42,19 @@ char	*expand_tilde(t_mini *mini, char *str)
 	return (result);
 }
 
-// Main expansion function that handles all types of expansions
+/**
+ * @brief Main token expansion function
+ * 
+ * @param mini Minishell context
+ * @param token Token to expand
+ * @return char* Expanded string or NULL on error
+ * 
+ * @note Handles:
+ * - Tilde expansion
+ * - Variable expansion (except in single quotes)
+ * - Exit status expansion ($?)
+ * Marks token as expanded when done
+ */
 char	*expand_token(t_mini *mini, t_token *token)
 {
 	char	*expanded;
@@ -54,6 +78,17 @@ char	*expand_token(t_mini *mini, t_token *token)
 	return (expanded);
 }
 
+/**
+ * @brief Extracts variable name from string
+ * 
+ * @param str String starting with $
+ * @return char* Extracted variable name or NULL
+ * 
+ * @note Handles special $? case and validates:
+ * - Alphanumeric characters
+ * - Underscores
+ * Returns NULL for invalid names
+ */
 char	*get_var_name(const char *str)
 {
 	int		i;
@@ -73,6 +108,15 @@ char	*get_var_name(const char *str)
 	return (name);
 }
 
+/**
+ * @brief Expands $? to exit status string
+ * 
+ * @param mini Minishell context
+ * @return char* String representation of exit status
+ * 
+ * @note Handles global exit status if set,
+ * otherwise uses mini->exit_status
+ */
 char	*expand_exit_status(t_mini *mini)
 {
 	char	*status_str;
@@ -86,6 +130,16 @@ char	*expand_exit_status(t_mini *mini)
 	return (status_str);
 }
 
+/**
+ * @brief Expands environment variable by name
+ * 
+ * @param mini Minishell context
+ * @param var_name Variable name to expand
+ * @return char* Variable value or empty string if not found
+ * 
+ * @note Special handling for $? (exit status)
+ * Returns empty string for undefined variables
+ */
 char	*expand_env_var(t_mini *mini, const char *var_name)
 {
 	t_env	*env_var;

@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/23 15:14:33 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/26 09:03:01 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/26 15:14:47 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,8 +89,8 @@ typedef struct s_command
 	int					exit_status;
 	int					has_input_redir;
 	int					has_output_redir;
-	int					append;
 	int					is_heredoc;
+	int					append;
 	struct s_mini		*mini;
 	int					error;
 	t_redirection		*redirections;
@@ -105,22 +105,13 @@ typedef struct s_env
 
 typedef struct s_mini
 {
-	t_token			*tokens;
-	int				num_tokens;
-	int				token_capacity;
 	t_command		*commands;
 	int				num_commands;
-	int				command_capacity;
 	t_env			*env;
 	char			**envp;
-	int				fd_in;
-	int				fd_out;
-	int				pipe_read;
-	int				pipe_write;
 	pid_t			last_pid;
 	int				exit_status;
 	int				should_exit;
-	int				is_builtin;
 }	t_mini;
 
 // Environment Functions
@@ -156,7 +147,6 @@ int		execute_builtin(t_mini *mini, int cmd_idx);
 // Command Execution & Pipelines
 int		execute_commands(t_mini *mini);
 int		execute_pipeline(t_mini *mini);
-void	exec_command(t_mini *mini, int cmd_idx);
 int		launch_external(t_mini *mini, int cmd_idx);
 int		wait_for_children(t_mini *mini, int last_status);
 char	*get_command_path(char *cmd, t_env *env);
@@ -170,24 +160,18 @@ int		setup_input_redir_file(t_command *cmd, char *file);
 int		setup_output_redir_file(t_command *cmd, char *file, int append);
 int		apply_redirections(t_command *cmd);
 void	free_redirections(t_command *cmd);
-int		add_redirection(t_command *cmd, t_redirection *new_redir);
-t_redirection	*create_redirection(t_token *type, t_token *file);
 
 // Pipe Handling
 int		setup_pipes(t_mini *mini, int cmd_idx);
-void	connect_pipes(t_mini *mini, int cmd_idx);
-void	close_pipes(t_mini *mini, int cmd_idx);
 
 // Command & Token Management
+int	init_mini(t_mini *mini, char **envp);
 int		init_commands(t_mini *mini, int num_commands);
 int		add_argument(t_command *cmd, char *arg, int arg_idx);
 void	free_commands(t_mini *mini);
-void	free_tokens(t_mini *mini);
 
 // Error Handling & Signal Handling
-void	exit_error(char *msg, int code);
-void	file_error(t_mini *mini, t_command *cmd, char *file);
-void	print_error(t_mini *mini, char *cmd, char *msg, int status);
+int		handle_file_open_error(t_command *cmd, char *filename);
 void	clean_exit(t_mini *mini);
 void	setup_signal_handlers(t_mini *mini);
 
@@ -218,12 +202,9 @@ char	*expand_tilde(t_mini *mini, char *str);
 void	free_token(void *content);
 
 // Token Handling
-int		ms_handle_redirection(t_mini *mini, t_command *cmd, t_list **temp);
-int		ms_process_tokens(t_mini *mini, t_lexer *lexer);
+int		process_tokens(t_mini *mini, t_lexer *lexer);
 int	handle_word_var(t_mini *mini, t_command *cmd, t_token *data, int *idx);
 int	handle_single_quote(t_command *cmd, t_token *data, int *arg_idx);
 int	concat_adjacent_strings(t_lexer *lexer);
-
-void print_commands(t_mini *mini);
 
 #endif

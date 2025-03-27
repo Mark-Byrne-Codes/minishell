@@ -6,26 +6,58 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 09:16:20 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/26 15:56:08 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/27 11:26:29 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 
 /**
- * @brief Implements the echo builtin command.
+ * @brief Checks if an argument is a valid '-n' option
  * 
- * This function replicates the behavior of the standard echo command:
- * - Prints all arguments separated by spaces
- * - Supports the -n flag to suppress the trailing newline
- * - Returns 0 on success
+ * Validates that the argument consists solely of '-'
+ * followed by one or more 'n' characters.
  * 
- * @param args Array of arguments where:
- *             args[0] is "echo"
- *             args[1] may be "-n" (optional flag)
- *             args[2..n] are the strings to be printed
- * @return int Always returns 0 (success) as echo doesn't have failure cases
- *             in this implementation
+ * @param arg The argument string to check
+ * @return int 1 if valid -n option, 0 otherwise
+ * 
+ */
+static int	is_valid_n_option(char *arg)
+{
+	size_t	i;
+
+	if (!arg || arg[0] != '-')
+		return (0);
+	i = 1;
+	while (arg[i])
+	{
+		if (arg[i] != 'n')
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
+/**
+ * @brief Implements the echo builtin command
+ * 
+ * Replicates standard echo behavior with support for:
+ * - Printing all arguments separated by spaces
+ * - -n option to suppress trailing newline
+ * - Multiple consecutive -n options (e.g., -nnnn)
+ * 
+ * @param args Argument array where:
+ *             args[0] = "echo" (command name)
+ *             args[1] = optional "-n" flag(s)
+ *             args[2..N] = strings to print
+ * @return int Always returns 0 (success)
+ * 
+ * @note Behavior matches POSIX echo specifications:
+ * - Multiple -n flags are treated as single -n
+ * - Arguments are printed exactly as given
+ * - No interpretation of escape sequences
+ * - Trailing newline omitted only if -n option present
+ * 
  */
 int	echo_builtin(char **args)
 {
@@ -34,7 +66,7 @@ int	echo_builtin(char **args)
 
 	newline = 1;
 	i = 1;
-	if (args[i] && ft_strcmp(args[i], "-n") == 0)
+	while (args[i] && is_valid_n_option(args[i]))
 	{
 		newline = 0;
 		i++;

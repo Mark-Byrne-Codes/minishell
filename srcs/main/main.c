@@ -6,13 +6,13 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/23 15:39:26 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/26 11:16:57 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/27 10:43:39 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-int	g_exit_status = 0;
+int	g_signal = 0;
 
 int	parse_and_execute(char *line, t_mini *mini, t_lexer *lex_data)
 {

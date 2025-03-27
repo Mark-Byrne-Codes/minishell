@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/23 15:14:33 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/26 15:14:47 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/27 13:54:56 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@
 # include "../libft/libft.h"
 # include <stdbool.h>
 
-extern int	g_exit_status;
+extern int	g_signal;
 
 typedef enum e_token_type
 {
@@ -114,7 +114,7 @@ typedef struct s_mini
 	int				should_exit;
 }	t_mini;
 
-// Environment Functions
+/* Environment Functions */
 t_env	*copy_env(char **envp);
 t_env	*create_env_node(char *name, char *value);
 void	add_env_node(t_env **head, t_env *new_node);
@@ -126,14 +126,14 @@ void	free_env_list(t_env *head);
 char	*get_env_value(t_env *env, char *key);
 void	print_env_vars(t_env *env);
 
-// Memory Management & String Handling
+/* Memory Management & String Handling */
 void	free_string_array(char **array);
 char	*join_and_free(char *s1, char *s2);
 char	*ft_strjoin3(char const *s1, char const *s2, char const *s3);
 char	*remove_quotes(const char *str);
 char	*get_var_name(const char *str);
 
-// Built-in Commands
+/* Built-in Commands */
 int		cd_builtin(t_mini *mini, char **args);
 int		env_builtin(t_mini *mini);
 int		echo_builtin(char **args);
@@ -144,7 +144,7 @@ int		unset_builtin(t_mini *mini, char **args);
 bool	is_builtin(char *command);
 int		execute_builtin(t_mini *mini, int cmd_idx);
 
-// Command Execution & Pipelines
+/* Command Execution & Pipelines */
 int		execute_commands(t_mini *mini);
 int		execute_pipeline(t_mini *mini);
 int		launch_external(t_mini *mini, int cmd_idx);
@@ -152,7 +152,7 @@ int		wait_for_children(t_mini *mini, int last_status);
 char	*get_command_path(char *cmd, t_env *env);
 int		execute_single_command(t_mini *mini, int i);
 
-// Redirection Handling
+/* Redirection Handling */
 int		handle_redirection(t_mini *mini, t_command *cmd);
 void	restore_io(int saved_stdin, int saved_stdout);
 int		setup_heredoc_delim(t_command *cmd, char *delim);
@@ -161,53 +161,53 @@ int		setup_output_redir_file(t_command *cmd, char *file, int append);
 int		apply_redirections(t_command *cmd);
 void	free_redirections(t_command *cmd);
 
-// Pipe Handling
+/* Pipe Handling */
 int		setup_pipes(t_mini *mini, int cmd_idx);
 
-// Command & Token Management
-int	init_mini(t_mini *mini, char **envp);
+/* Command & Token Management */
+int		init_mini(t_mini *mini, char **envp);
 int		init_commands(t_mini *mini, int num_commands);
 int		add_argument(t_command *cmd, char *arg, int arg_idx);
 void	free_commands(t_mini *mini);
 
-// Error Handling & Signal Handling
+/* Error Handling & Signal Handling */
 int		handle_file_open_error(t_command *cmd, char *filename);
 void	clean_exit(t_mini *mini);
-void	setup_signal_handlers();
+void	setup_signal_handlers(void);
 void	signal_handler_heredoc(int signum);
 void	setup_heredoc_signals(void);
-void	restore_default_signals();
+void	restore_default_signals(void);
 void	signal_handler_interactive(int signum);
 
-// Prompt & Variable Expansion
+/* Prompt & Variable Expansion */
 char	*get_prompt(void);
 char	*expand_exit_status(t_mini *mini);
 char	*expand_env_var(t_mini *mini, const char *var_name);
 
-// Lexer Functions
+/* Lexer Functions */
 int		parse_line(t_lexer *lexer, char *command, t_mini *mini);
 void	*handle_variable_token(t_lexer *lexer, char *cmd);
 void	*handle_word_token(t_lexer *lexer, char *cmd);
 void	*handle_double_quoted_string(t_lexer *lexer, char *command);
 void	*handle_single_quoted_string(t_lexer *lexer, char *command);
 void	init_lexer(t_lexer *lexer);
-void	*add_token_to_list(t_lexer *lexer, char *str, int len, t_token_type token);
+void	*add_token_to_list(t_lexer *lexer, char *str, int len, t_token_type t);
 void	toggle_quote_state(int *flag);
 int		is_whitespace_character(unsigned int c);
 void	cleanup_on_token_error(t_lexer *lexer, int end);
 int		is_quote_character(unsigned int c);
 void	cleanup_lexer(t_lexer *lexer);
 
-// Token Expansion
+/* Token Expansion */
 char	*expand_token(t_mini *mini, t_token *token);
 char	*expand_variables(t_mini *mini, char *str, int in_quotes);
 char	*expand_tilde(t_mini *mini, char *str);
 void	free_token(void *content);
 
-// Token Handling
+/* Token Handling */
 int		process_tokens(t_mini *mini, t_lexer *lexer);
-int	handle_word_var(t_mini *mini, t_command *cmd, t_token *data, int *idx);
-int	handle_single_quote(t_command *cmd, t_token *data, int *arg_idx);
-int	concat_adjacent_strings(t_lexer *lexer);
+int		handle_word_var(t_mini *mini, t_command *cmd, t_token *data, int *idx);
+int		handle_single_quote(t_command *cmd, t_token *data, int *arg_idx);
+int		concat_adjacent_strings(t_lexer *lexer);
 
 #endif

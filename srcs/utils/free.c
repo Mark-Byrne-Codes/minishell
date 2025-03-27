@@ -6,12 +6,21 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 11:29:15 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/26 11:17:41 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/27 14:10:24 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 
+/**
+ * @brief Frees a NULL-terminated array of strings
+ * 
+ * @param array The array to free (may be NULL)
+ * 
+ * @note Safely handles NULL input
+ * @note Frees each string element before freeing the array itself
+ * @note Sets pointers to NULL after freeing
+ */
 void	free_string_array(char **array)
 {
 	int	i;
@@ -27,7 +36,15 @@ void	free_string_array(char **array)
 	free(array);
 }
 
-/* Free a single token */
+/**
+ * @brief Frees a single token structure
+ * 
+ * @param content Void pointer to t_token (for use with ft_lstclear)
+ * 
+ * @note Handles NULL input safely
+ * @note Frees both the token string and the token structure itself
+ * @note Compatible with ft_lstclear as a del function
+ */
 void	free_token(void *content)
 {
 	t_token	*token;
@@ -40,6 +57,16 @@ void	free_token(void *content)
 	free(token);
 }
 
+/**
+ * @brief Frees all redirection structures in a command
+ * 
+ * @param cmd The command containing the redirections to free
+ * 
+ * @note Iterates through the linked list of redirections
+ * @note Frees both the filename strings and the redirection nodes
+ * @note Sets the redirections pointer to NULL after freeing
+ * @note Handles NULL cmd input safely
+ */
 void	free_redirections(t_command *cmd)
 {
 	t_redirection	*current;
@@ -57,6 +84,19 @@ void	free_redirections(t_command *cmd)
 	cmd->redirections = NULL;
 }
 
+/**
+ * @brief Frees all command structures and their resources
+ * 
+ * @param mini The main shell structure containing commands to free
+ * 
+ * @note Performs complete cleanup of:
+ * - Command argument arrays
+ * - Redirection structures
+ * - Open file descriptors (except STDIN/STDOUT)
+ * - Command array itself
+ * @note Handles NULL inputs safely
+ * @note Sets pointers to NULL after freeing
+ */
 void	free_commands(t_mini *mini)
 {
 	int	i;

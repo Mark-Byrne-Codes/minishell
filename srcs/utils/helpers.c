@@ -6,12 +6,24 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/23 13:48:06 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/26 11:17:29 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/27 14:10:21 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 
+/**
+ * @brief Concatenates three strings into a new allocated string
+ * 
+ * @param s1 First string to concatenate
+ * @param s2 Second string to concatenate
+ * @param s3 Third string to concatenate
+ * @return char* Newly allocated concatenated string, or NULL on failure
+ * 
+ * @note All input strings must be non-NULL
+ * @note Uses ft_calloc for memory allocation
+ * @note Caller is responsible for freeing the returned string
+ */
 char	*ft_strjoin3(char const *s1, char const *s2, char const *s3)
 {
 	char	*result;
@@ -33,6 +45,17 @@ char	*ft_strjoin3(char const *s1, char const *s2, char const *s3)
 	return (result);
 }
 
+/**
+ * @brief Joins two strings and frees the original strings
+ * 
+ * @param s1 First string (will be freed)
+ * @param s2 Second string (will be freed)
+ * @return char* New concatenated string, or NULL on failure
+ * 
+ * @note If s1 is NULL, returns duplicate of s2
+ * @note If s2 is NULL, frees s1 and returns NULL
+ * @note Handles memory allocation failures gracefully
+ */
 char	*join_and_free(char *s1, char *s2)
 {
 	char	*result;
@@ -62,6 +85,16 @@ char	*join_and_free(char *s1, char *s2)
 	return (result);
 }
 
+/**
+ * @brief Removes all quote characters from a string
+ * 
+ * @param str Input string containing quotes
+ * @return char* New string with quotes removed, or NULL on failure
+ * 
+ * @note Handles nested quotes properly
+ * @note Preserves content inside quotes
+ * @note Allocates new memory for the result
+ */
 char	*remove_quotes(const char *str)
 {
 	int		i;
@@ -91,8 +124,14 @@ char	*remove_quotes(const char *str)
 }
 
 /**
- * Restores the original file descriptors
- * Used after command execution to restore the shell's I/O
+ * @brief Restores standard input/output to original state
+ * 
+ * @param saved_stdin Saved stdin file descriptor
+ * @param saved_stdout Saved stdout file descriptor
+ * 
+ * @note Only restores if the saved descriptors differ from STDIN/STDOUT
+ * @note Closes the saved descriptors after restoration
+ * @note Typically used after command execution with redirected I/O
  */
 void	restore_io(int saved_stdin, int saved_stdout)
 {
@@ -109,10 +148,13 @@ void	restore_io(int saved_stdin, int saved_stdout)
 }
 
 /**
- * @brief Checks if a character is a quote character
+ * @brief Determines if a character is a quote character
  * 
  * @param c Character to check
- * @return int 0 if not a quote, 1 if single quote, 2 if double quote
+ * @return int 1 for single quote, 2 for double quote, 0 otherwise
+ * 
+ * @note Uses ASCII values (39 for ', 34 for ")
+ * @note Helpful for quote parsing and handling
  */
 int	is_quote_character(unsigned int c)
 {

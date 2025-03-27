@@ -1,17 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   exec_heredoc.c                                     :+:      :+:    :+:   */
+/*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/18 15:30:12 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/26 12:06:37 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/27 11:56:05 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 
+/**
+ * @brief Processes a single line of heredoc input
+ * 
+ * Expands variables in the line and writes it to the heredoc pipe.
+ * Handles all necessary memory management for the input line.
+ * 
+ * @param cmd Command structure containing execution context
+ * @param line Input line to process (will be freed)
+ * @param pipe_fd Pipe file descriptors [read, write]
+ * @return int SUCCESS (0) on success, ERROR (1) on failure
+ * 
+ * @note Closes both pipe ends and returns ERROR if expansion fails
+ * @warning Frees the input line regardless of success/failure
+ */
 static int	process_heredoc_line(t_command *cmd, char *line, int pipe_fd[2])
 {
 	char	*expanded_line;
@@ -30,6 +44,20 @@ static int	process_heredoc_line(t_command *cmd, char *line, int pipe_fd[2])
 	return (SUCCESS);
 }
 
+/**
+ * @brief Handles the heredoc input loop
+ * 
+ * Reads input line by line until delimiter is found or error occurs.
+ * 
+ * @param cmd Command structure
+ * @param delim The heredoc delimiter (unquoted)
+ * @param pipe_fd Pipe file descriptors
+ * @return int SUCCESS if delimiter found, ERROR on failure
+ * 
+ * @note Displays "> " prompt for each line
+ * @note Returns SUCCESS on EOF (Ctrl+D) with empty line
+ * @note Properly handles SIGINT interruption via global g_signal
+ */
 static int	handle_heredoc_input(t_command *cmd, char *delim, int pipe_fd[2])
 {
 	char	*line;
@@ -38,9 +66,9 @@ static int	handle_heredoc_input(t_command *cmd, char *delim, int pipe_fd[2])
 	{
 		write(STDOUT_FILENO, "> ", 2);
 		line = readline("");
-		if (!line) 
+		if (!line)
 		{
-			write(STDOUT_FILENO, "\n", 1); 
+			write(STDOUT_FILENO, "\n", 1);
 			return (SUCCESS);
 		}
 		if (ft_strcmp(line, delim) == 0)
@@ -53,6 +81,19 @@ static int	handle_heredoc_input(t_command *cmd, char *delim, int pipe_fd[2])
 	}
 }
 
+/**
+ * @brief Child process execution for heredoc
+ * 
+ * Sets up signal handlers and processes heredoc input in a child process.
+ * 
+ * @param cmd Command structure
+ * @param delim Heredoc delimiter
+ * @param pipe_fd Pipe file descriptors
+ * 
+ * @note Exits with EXIT_FAILURE (1) on error
+ * @note Exits with EXIT_SUCCESS (0) on normal completion
+ * @warning This function does not return - it exits the child process
+ */
 static void	handle_child_process(t_command *cmd, char *delim, int pipe_fd[2])
 {
 	setup_heredoc_signals();
@@ -68,18 +109,32 @@ static void	handle_child_process(t_command *cmd, char *delim, int pipe_fd[2])
 	exit(EXIT_SUCCESS);
 }
 
+/**
+ * @brief Parent process handling for heredoc
+ * 
+ * Waits for child completion and handles the result.
+ * 
+ * @param cmd Command structure
+ * @param pipe_fd Pipe file descriptors
+ * @param pid Child process ID
+ * @return int SUCCESS if heredoc completed, ERROR if interrupted/failed
+ * 
+ * @note Restores default signal handlers after completion
+ * @note Sets command's input redirection fields on success
+ * @note Sets g_signal to 130 (SIGINT) if interrupted
+ */
 static int	handle_parent_process(t_command *cmd, int pipe_fd[2], pid_t pid)
 {
 	int	status;
 
 	close(pipe_fd[1]);
 	waitpid(pid, &status, 0);
-	if ((WIFSIGNALED(status) && WTERMSIG(status) == SIGINT) || 
+	if ((WIFSIGNALED(status) && WTERMSIG(status) == SIGINT) || \
 		(WIFEXITED(status) && WEXITSTATUS(status) == 130))
 	{
 		close(pipe_fd[0]);
 		cmd->error = 1;
-		g_exit_status = 130;
+		g_signal = 130;
 		signal(SIGINT, signal_handler_interactive);
 		signal(SIGQUIT, SIG_IGN);
 		return (ERROR);
@@ -92,6 +147,19 @@ static int	handle_parent_process(t_command *cmd, int pipe_fd[2], pid_t pid)
 	return (SUCCESS);
 }
 
+/**
+ * @brief Main heredoc setup function
+ * 
+ * Creates pipe, forks process, and manages heredoc execution.
+ * 
+ * @param cmd Command structure
+ * @param delim Heredoc delimiter (may be quoted)
+ * @return int SUCCESS if heredoc ready, ERROR on failure
+ * 
+ * @note Removes quotes from delimiter before use
+ * @note Handles all pipe and process cleanup
+ * @note Manages both parent and child process execution paths
+ */
 int	setup_heredoc_delim(t_command *cmd, char *delim)
 {
 	int		pipe_fd[2];
@@ -104,7 +172,8 @@ int	setup_heredoc_delim(t_command *cmd, char *delim)
 		return (ERROR);
 	}
 	unq_delim = remove_quotes(delim);
-	if (!unq_delim || (pid = fork()) < 0)
+	pid = fork();
+	if (!unq_delim || pid < 0)
 	{
 		if (unq_delim)
 			free(unq_delim);

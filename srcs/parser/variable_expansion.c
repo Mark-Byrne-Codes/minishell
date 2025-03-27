@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ms_expand_var.c                                    :+:      :+:    :+:   */
+/*   variable_expansion.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:54:23 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/26 12:05:01 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/27 11:44:55 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,9 +121,9 @@ char	*expand_exit_status(t_mini *mini)
 {
 	char	*status_str;
 
-	if (g_exit_status != 0)
-		mini->exit_status = g_exit_status;
-	g_exit_status = 0;
+	if (g_signal != 0)
+		mini->exit_status = g_signal;
+	g_signal = 0;
 	status_str = ft_itoa(mini->exit_status);
 	if (!status_str)
 		return (ft_strdup(""));

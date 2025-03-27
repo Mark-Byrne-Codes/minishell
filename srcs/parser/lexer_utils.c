@@ -12,12 +12,17 @@
 
 #include "../../includes/minishell.h"
 
-/*
- * Adds a new entry to the dictionary. Creates pointers to a new token and node
- * 	fills the token's data and creates the new node then adds it to the end
- * 	of the current list.
- * Params: lexer, *string, len, token
- * Returns: nothing yet
+/**
+ * @brief Adds new entry to dictionary
+ * 
+ * @param lexer Lexer data struct type: t_lexer
+ * @param str Command string
+ * @param len Length of string to add
+ * @param token Enum token types (needed?)
+ * @return void* Pointer to current location in command
+ * 
+ * @note Adds entry from command string
+ * - Length defined by caller
  */
 void	*add_token_to_list(t_lexer *lexer, char *str, int len,
 		t_token_type token)
@@ -48,9 +53,13 @@ void	*add_token_to_list(t_lexer *lexer, char *str, int len,
 	return (str + len);
 }
 
-/*
- * Changes the value of a flag. Ghetto bool for stick in the muds.
- * Params: flag
+/**
+ * @brief Changes the value of a flag
+ * 
+ * @param *flag Pointer to int flag
+ * 
+ * @note Either 0 or 1. Switches when called.
+ * 
  */
 void	toggle_quote_state(int *flag)
 {
@@ -60,11 +69,15 @@ void	toggle_quote_state(int *flag)
 		*flag = 0;
 }
 
-/*
- * Checks if a character is an input field separator. Generally these are
- * 	space, tab, new line.
- * Param: char
- * Return: 0 if not, 1 if
+/**
+ * @brief Checks if a character is an input field separator.
+ * 
+ * @param c Value to check
+ * @return int 1 if IFS, 0 if not
+ * 
+ * @note As it is default is space, tab, new line
+ * - Could be adapted to use $IFS if needed
+ * 
  */
 int	is_whitespace_character(unsigned int c)
 {
@@ -73,11 +86,13 @@ int	is_whitespace_character(unsigned int c)
 	return (0);
 }
 
-/*
- * Clean up the lexer data after expected or unexpected end.
- * Rolls through the list, freeing the token's string then clears the rest of
- * the list. Exits with failure code.
- * params: *lexer, end flag (1 to exit fail, 0 to not)
+/**
+ * @brief Clean up the lexer data. 
+ * 
+ * @param lexer Lexer data struct type: t_lexer
+ * @param end 1 if exit required
+ * 
+ * @note Used after expected or unexpected end.
  */
 void	cleanup_on_token_error(t_lexer *lexer, int end)
 {

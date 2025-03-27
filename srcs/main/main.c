@@ -12,7 +12,7 @@
 
 #include "../includes/minishell.h"
 
-int	g_signal = 0;
+int	g_signal;
 
 int	parse_and_execute(char *line, t_mini *mini, t_lexer *lex_data)
 {
@@ -47,15 +47,19 @@ void	process_input_line(char *line, t_mini *mini)
 	if (*line == '\0')
 	{
 		free(line);
+		free(lex_data);
 		return ;
 	}
 	add_history(line);
 	if (parse_and_execute(line, mini, lex_data) == ERROR)
 	{
 		free(line);
+		free(lex_data);
 		return ;
 	}
 	free(line);
+	if (!lex_data)
+		free(lex_data);
 }
 
 void	main_loop(t_mini *mini)
@@ -88,6 +92,7 @@ int	main(int argc, char **argv, char **envp)
 		return (1);
 	}
 	(void)argv;
+	g_signal = 0;
 	if (init_mini(&mini, envp) != 0)
 		return (1);
 	main_loop(&mini);

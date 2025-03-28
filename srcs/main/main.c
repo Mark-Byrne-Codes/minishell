@@ -44,6 +44,11 @@ void	process_input_line(char *line, t_mini *mini)
 	t_lexer	*lex_data;
 
 	lex_data = ft_calloc(1, sizeof(t_lexer));
+	if (!lex_data)
+	{
+		mini->should_exit = 1;
+		return ;
+	}
 	if (*line == '\0')
 	{
 		free(line);

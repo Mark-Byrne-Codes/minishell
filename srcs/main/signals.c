@@ -54,7 +54,6 @@ void	signal_handler_heredoc(int signum)
 {
 	if (signum == SIGINT)
 	{
-		write(STDOUT_FILENO, "\n", 1);
 		close(STDIN_FILENO);
 		exit(130);
 	}

@@ -29,6 +29,8 @@ static int	is_valid_n_option(char *arg)
 	if (!arg || arg[0] != '-')
 		return (0);
 	i = 1;
+	if (!arg[i])
+		return (0);
 	while (arg[i])
 	{
 		if (arg[i] != 'n')

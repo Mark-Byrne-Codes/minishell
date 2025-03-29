@@ -68,7 +68,7 @@ static int	handle_heredoc_input(t_command *cmd, char *delim, int pipe_fd[2])
 		line = readline("");
 		if (!line)
 		{
-			write(STDOUT_FILENO, "\n", 1);
+			ft_putstr_fd("minishell: warning: heredoc delimited by EOF\n", 2);
 			return (SUCCESS);
 		}
 		if (ft_strcmp(line, delim) == 0)

@@ -51,7 +51,7 @@ static int	init_exit_status(t_mini *mini, int last_cmd_error)
 {
 	if (mini->num_commands > 1)
 	{
-		if (last_cmd_error)
+		if (last_cmd_error && mini->commands[mini->num_commands - 1].error)
 			return (1);
 		return (0);
 	}
@@ -80,12 +80,13 @@ static int	process_child_status(t_mini *mini, pid_t pid, int status,
 		if (WIFEXITED(status))
 		{
 			mini->exit_status = WEXITSTATUS(status);
-			if (!(mini->num_commands > 1
-					&& mini->commands[mini->num_commands - 1].error))
-				last_exit_status = mini->exit_status;
+			last_exit_status = mini->exit_status;
 		}
 		else if (WIFSIGNALED(status))
+		{
 			mini->exit_status = 128 + WTERMSIG(status);
+			last_exit_status = mini->exit_status;
+		}
 	}
 	return (last_exit_status);
 }
@@ -120,7 +121,10 @@ int	wait_for_children(t_mini *mini, int last_status)
 		pid = waitpid(-1, &status, WUNTRACED);
 	}
 	if (mini->num_commands > 1)
+	{
 		mini->exit_status = last_exit_status;
+		return (last_exit_status);
+	}
 	else if (mini->exit_status == 0 && last_status != SUCCESS)
 		mini->exit_status = last_status;
 	return (mini->exit_status);

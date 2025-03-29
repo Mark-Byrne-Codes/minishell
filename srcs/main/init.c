@@ -39,6 +39,7 @@ int	init_commands(t_mini *mini, int num_commands)
 		mini->commands[i].fd_out = STDOUT_FILENO;
 		mini->commands[i].pipe_read = -1;
 		mini->commands[i].pipe_write = -1;
+		mini->commands[i].pid = -1;
 		mini->commands[i].mini = mini;
 		i++;
 	}

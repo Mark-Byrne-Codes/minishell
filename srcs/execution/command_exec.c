@@ -29,13 +29,13 @@ static int	setup_io(int *saved_stdin, int *saved_stdout)
 }
 
 /**
- *Sets up pipe redirections for the current command
+ * Sets up pipe redirections for the current command
  * 
  * param mini Pointer to the main minishell structure
  * param i Index of the current command
  * return int Returns SUCCESS on success, ERROR on failure
  */
-static int	handle_pipe_setup(t_mini *mini, int i)
+int	handle_pipe_setup(t_mini *mini, int i)
 {
 	if (i < mini->num_commands - 1)
 	{
@@ -82,23 +82,34 @@ static void	close_fds(t_command *cmd)
 }
 
 /**
- * Prepares a command for execution by setting up I/O and pipes
+ * Prepares a command for execution by handling redirections
  * 
  * param mini Pointer to the main minishell structure
  * param i Index of the current command
- * param saved_stdin Pointer to store the saved stdin fd
- * param saved_stdout Pointer to store the saved stdout fd
+ * param flags Bit flags for options: 
+ *             bit 0 (1): save_io - whether to save stdin/stdout
+ *             bit 1 (2): setup_pipe - whether to set up pipes
+ * param saved_fds Array to store saved file descriptors:
+ *                 saved_fds[0]: saved stdin
+ *                 saved_fds[1]: saved stdout
  * return int Returns SUCCESS on success, ERROR on failure
  */
-static int	prepare_command(t_mini *mini, int i,
-			int *saved_stdin, int *saved_stdout)
+int	prepare_command(t_mini *mini, int i, int flags, int *saved_fds)
 {
-	if (setup_io(saved_stdin, saved_stdout) == ERROR)
+	int	save_io;
+	int	setup_pipe;
+
+	save_io = flags & 1;
+	setup_pipe = flags & 2;
+	if (save_io && setup_io(&saved_fds[0], &saved_fds[1]) == ERROR)
 		return (ERROR);
-	if (setup_pipes(mini, i) == ERROR)
-		return (ERROR);
-	if (handle_pipe_setup(mini, i) == ERROR)
-		return (ERROR);
+	if (setup_pipe)
+	{
+		if (setup_pipes(mini, i) == ERROR)
+			return (ERROR);
+		if (handle_pipe_setup(mini, i) == ERROR)
+			return (ERROR);
+	}
 	if (mini->commands[i].redirections)
 	{
 		if (handle_redirection(mini, &mini->commands[i]) == ERROR)
@@ -121,24 +132,21 @@ int	execute_commands(t_mini *mini)
 	int	i;
 	int	status;
 	int	pipe_failed;
-	int	saved_stdin;
-	int	saved_stdout;
+	int	saved_fds[2];
 
 	i = 0;
 	pipe_failed = 0;
-	while (i < mini->num_commands)
+	if (mini->num_commands > 1)
+		return (execute_pipeline(mini));
+	if (prepare_command(mini, i, 3, saved_fds) == ERROR)
 	{
-		if (prepare_command(mini, i, &saved_stdin, &saved_stdout) == ERROR)
-		{
-			pipe_failed = 1;
-			mini->commands[i].error = 1;
-		}
-		else
-			status = execute_single_command(mini, i);
-		close_fds(&mini->commands[i]);
-		restore_io(saved_stdin, saved_stdout);
-		i++;
+		pipe_failed = 1;
+		mini->commands[i].error = 1;
 	}
+	else
+		status = execute_single_command(mini, i);
+	close_fds(&mini->commands[i]);
+	restore_io(saved_fds[0], saved_fds[1]);
 	if (mini->num_commands == 1 && mini->commands[0].error)
 		mini->exit_status = 1;
 	return (wait_for_children(mini, pipe_failed * 1 + !pipe_failed * status));

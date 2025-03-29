@@ -93,6 +93,7 @@ typedef struct s_command
 	int					append;
 	struct s_mini		*mini;
 	int					error;
+	pid_t				pid;
 	t_redirection		*redirections;
 }	t_command;
 
@@ -163,10 +164,13 @@ void	free_redirections(t_command *cmd);
 
 /* Pipe Handling */
 int		setup_pipes(t_mini *mini, int cmd_idx);
+int		handle_pipe_setup(t_mini *mini, int i);
+void	close_other_pipes(t_mini *mini, int cmd_idx);
 
 /* Command & Token Management */
 int		init_mini(t_mini *mini, char **envp);
 int		init_commands(t_mini *mini, int num_commands);
+int		prepare_command(t_mini *mini, int i, int flags, int *saved_fds);
 int		add_argument(t_command *cmd, char *arg, int arg_idx);
 void	free_commands(t_mini *mini);
 

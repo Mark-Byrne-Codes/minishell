@@ -85,7 +85,7 @@ static int	handle_execution_error(t_mini *mini, int cmd_idx)
  * @note This prevents pipe leaks in child processes and ensures proper
  * cleanup of file descriptors.
  */
-static void	close_other_pipes(t_mini *mini, int cmd_idx)
+void	close_other_pipes(t_mini *mini, int cmd_idx)
 {
 	int	i;
 
@@ -128,7 +128,6 @@ static int	execute_child_process(t_mini *mini, int cmd_idx, char *cmd_path)
 	pid = fork();
 	if (pid == 0)
 	{
-		signal(SIGPIPE, SIG_IGN);
 		if (is_builtin)
 			exit(execute_builtin(mini, cmd_idx));
 		close_other_pipes(mini, cmd_idx);
@@ -141,6 +140,7 @@ static int	execute_child_process(t_mini *mini, int cmd_idx, char *cmd_path)
 	else if (pid < 0)
 		return (ERROR);
 	mini->last_pid = pid;
+	mini->commands[cmd_idx].pid = pid;
 	return (SUCCESS);
 }
 

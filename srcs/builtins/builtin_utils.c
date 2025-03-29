@@ -53,15 +53,12 @@ bool	is_builtin(char *command)
 static int	handle_io_for_builtin(t_mini *mini, t_command *cmd,
 		int *saved_stdin, int *saved_stdout)
 {
-	if (mini->num_commands == 1)
+	*saved_stdin = dup(STDIN_FILENO);
+	*saved_stdout = dup(STDOUT_FILENO);
+	if (handle_redirection(mini, cmd) == ERROR)
 	{
-		*saved_stdin = dup(STDIN_FILENO);
-		*saved_stdout = dup(STDOUT_FILENO);
-		if (handle_redirection(mini, cmd) == ERROR)
-		{
-			restore_io(*saved_stdin, *saved_stdout);
-			return (ERROR);
-		}
+		restore_io(*saved_stdin, *saved_stdout);
+		return (ERROR);
 	}
 	return (SUCCESS);
 }
@@ -136,7 +133,6 @@ int	execute_builtin(t_mini *mini, int cmd_idx)
 	result = execute_simple_builtin(mini, cmd);
 	if (result == 0)
 		result = execute_complex_builtin(mini, cmd);
-	if (mini->num_commands == 1)
-		restore_io(saved_stdin, saved_stdout);
+	restore_io(saved_stdin, saved_stdout);
 	return (result);
 }

@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/23 15:14:33 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/27 13:54:56 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/30 15:52:02 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,7 @@ typedef struct s_redirection
 {
 	int						type;
 	char					*file;
+	int						processed;
 	struct s_redirection	*next;
 }	t_redirection;
 
@@ -152,6 +153,7 @@ int		launch_external(t_mini *mini, int cmd_idx);
 int		wait_for_children(t_mini *mini, int last_status);
 char	*get_command_path(char *cmd, t_env *env);
 int		execute_single_command(t_mini *mini, int i);
+int		preprocess_heredocs(t_mini *mini);
 
 /* Redirection Handling */
 int		handle_redirection(t_mini *mini, t_command *cmd);

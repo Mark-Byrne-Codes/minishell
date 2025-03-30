@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/12 11:16:34 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/27 11:44:12 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/30 15:19:50 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,13 +136,13 @@ int	execute_commands(t_mini *mini)
 
 	i = 0;
 	pipe_failed = 0;
+	status = 0;
+	if (preprocess_heredocs(mini) == ERROR)
+		return (ERROR);
 	if (mini->num_commands > 1)
 		return (execute_pipeline(mini));
 	if (prepare_command(mini, i, 3, saved_fds) == ERROR)
-	{
-		pipe_failed = 1;
 		mini->commands[i].error = 1;
-	}
 	else
 		status = execute_single_command(mini, i);
 	close_fds(&mini->commands[i]);

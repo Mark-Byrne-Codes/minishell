@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/15 00:27:13 by elehtone          #+#    #+#             */
-/*   Updated: 2025/03/27 11:44:51 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/30 15:46:47 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,4 +107,39 @@ void	*handle_single_quoted_string(t_lexer *lexer, char *cmd)
 		return (start + len + 1);
 	else
 		return (start + len);
+}
+
+/**
+ * @brief Processes all heredocs before command execution
+ * 
+ * @param mini Pointer to minishell structure
+ * @return int SUCCESS if all heredocs processed, ERROR on failure
+ * 
+ * @note Sets redir->processed flag for each heredoc
+ * @warning Stops processing on first error
+ */
+int	preprocess_heredocs(t_mini *mini)
+{
+	t_command		*cmd;
+	t_redirection	*redir;
+	int				i;
+
+	i = 0;
+	while (i < mini->num_commands)
+	{
+		cmd = &mini->commands[i];
+		redir = cmd->redirections;
+		while (redir)
+		{
+			if (redir->type == TOKEN_HEREDOC)
+			{
+				if (setup_heredoc_delim(cmd, redir->file) == ERROR)
+					return (ERROR);
+				redir->processed = 1;
+			}
+			redir = redir->next;
+		}
+		i++;
+	}
+	return (SUCCESS);
 }

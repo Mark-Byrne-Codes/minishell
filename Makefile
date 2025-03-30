@@ -47,7 +47,6 @@ SRCS_EXEC = 	srcs/execution/command_exec.c \
 				srcs/execution/process_control.c \
 				srcs/execution/path.c \
 				srcs/execution/external_command_exec.c \
-				srcs/execution/heredoc.c
  
 SRCS_PARSE = srcs/parser/lexer_utils.c \
 					srcs/parser/lexer.c \
@@ -56,6 +55,7 @@ SRCS_PARSE = srcs/parser/lexer_utils.c \
 					srcs/parser/variable_expansion.c \
 					srcs/parser/command_parser.c \
 					srcs/parser/token_processor.c \
+					srcs/parser/heredoc.c \
 
 
 SRCS = $(SRCS_MAIN) $(SRCS_ENV) $(SRCS_UTILS) $(SRCS_BUILTINS) $(SRCS_EXEC) $(SRCS_PARSE)

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ms_parser.c                                        :+:      :+:    :+:   */
+/*   command_parser.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/23 12:33:39 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/26 12:19:56 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/30 15:04:02 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,6 @@ static int	add_redirection(t_command *cmd, t_redirection *new_redir)
 /**
  * @brief Processes redirection tokens and builds the redirection list
  * 
- * @param mini Minishell context (unused in current implementation)
  * @param cmd Command structure to store redirections
  * @param temp Pointer to current position in token list
  * @return int SUCCESS on success, ERROR on failure

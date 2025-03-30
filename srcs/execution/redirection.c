@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/12 11:16:39 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/27 11:44:26 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/30 15:51:48 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,40 +105,35 @@ static int	process_redirection(t_command *cmd, t_redirection *r)
 }
 
 /**
- * @brief Processes all redirections for a command
+ * @brief Handles all redirections for a command
  * 
- * @param mini Pointer to the main minishell structure
- * @param cmd Pointer to the command structure
- * @return int SUCCESS if all redirections succeed, ERROR otherwise
+ * @param mini Main shell structure
+ * @param cmd Current command being processed
+ * @return int SUCCESS if all redirections applied, ERROR on failure
  * 
- * @note Iterates through the command's redirection list and processes each one.
- * Sets error flags and exit status if any redirection fails.
+ * @note Skips pre-processed heredocs
+ * @warning Sets exit status on error
  */
 int	handle_redirection(t_mini *mini, t_command *cmd)
 {
 	t_redirection	*redir;
-	int				redir_error;
+	int				status;
 
+	status = SUCCESS;
 	redir = cmd->redirections;
-	redir_error = 0;
-	while (redir && !redir_error)
+	while (redir && status == SUCCESS)
 	{
-		if (process_redirection(cmd, redir) == ERROR)
-		{
-			redir_error = 1;
-			cmd->error = 1;
-		}
+		if (!(redir->type == TOKEN_HEREDOC && redir->processed))
+			status = process_redirection(cmd, redir);
 		redir = redir->next;
 	}
-	if (redir_error)
+	if (status == ERROR)
 	{
 		mini->exit_status = 1;
 		cmd->exit_status = 1;
 		return (ERROR);
 	}
-	if (apply_redirections(cmd) == ERROR)
-		return (ERROR);
-	return (SUCCESS);
+	return (apply_redirections(cmd));
 }
 
 /**

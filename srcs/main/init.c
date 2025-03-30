@@ -67,6 +67,7 @@ int	init_mini(t_mini *mini, char **envp)
 	mini->envp = envp;
 	mini->exit_status = 0;
 	mini->should_exit = 0;
+	mini->lexer_data = NULL;
 	setup_signal_handlers();
 	return (0);
 }

@@ -114,6 +114,7 @@ typedef struct s_mini
 	pid_t			last_pid;
 	int				exit_status;
 	int				should_exit;
+	t_lexer			*lexer_data;
 }	t_mini;
 
 /* Environment Functions */

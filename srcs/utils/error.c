@@ -54,6 +54,12 @@ void	clean_exit(t_mini *mini)
 		free_env_list(mini->env);
 	if (mini->commands)
 		free_commands(mini);
+	if (mini->lexer_data)
+	{
+		cleanup_on_token_error(mini->lexer_data, 0);
+		free(mini->lexer_data);
+		mini->lexer_data = NULL;
+	}
 	exit(exit_status);
 }
 

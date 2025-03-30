@@ -14,8 +14,11 @@
 
 int	g_signal;
 
-int	parse_and_execute(char *line, t_mini *mini, t_lexer *lex_data)
+int	parse_and_execute(char *line, t_mini *mini)
 {
+	t_lexer	*lex_data;
+
+	lex_data = mini->lexer_data;
 	if (!lex_data)
 	{
 		mini->exit_status = ERROR;
@@ -23,45 +26,46 @@ int	parse_and_execute(char *line, t_mini *mini, t_lexer *lex_data)
 	}
 	if (parse_line(lex_data, line, mini) == ERROR)
 	{
-		free(lex_data);
 		mini->exit_status = ERROR;
 		return (ERROR);
 	}
 	if (mini->num_commands > 0 && execute_commands(mini) == ERROR)
 	{
 		free_commands(mini);
-		free(lex_data);
 		mini->exit_status = ERROR;
 		return (ERROR);
 	}
 	free_commands(mini);
-	free(lex_data);
 	return (SUCCESS);
 }
 
 void	process_input_line(char *line, t_mini *mini)
 {
-	t_lexer	*lex_data;
-
-	lex_data = ft_calloc(1, sizeof(t_lexer));
-	if (!lex_data)
-	{
-		mini->should_exit = 1;
-		return ;
-	}
 	if (*line == '\0')
 	{
 		free(line);
-		free(lex_data);
 		return ;
 	}
 	add_history(line);
-	if (parse_and_execute(line, mini, lex_data) == ERROR)
+	mini->lexer_data = ft_calloc(1, sizeof(t_lexer));
+	if (!mini->lexer_data)
+	{
+		mini->should_exit = 1;
+		free(line);
+		return ;
+	}
+	if (parse_and_execute(line, mini) == ERROR)
 	{
 		free(line);
 		return ;
 	}
 	free(line);
+	if (mini->lexer_data)
+	{
+		cleanup_lexer(mini->lexer_data);
+		free(mini->lexer_data);
+		mini->lexer_data = NULL;
+	}
 }
 
 void	main_loop(t_mini *mini)

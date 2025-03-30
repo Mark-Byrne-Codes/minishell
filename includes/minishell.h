@@ -158,7 +158,7 @@ int		preprocess_heredocs(t_mini *mini);
 /* Redirection Handling */
 int		handle_redirection(t_mini *mini, t_command *cmd);
 void	restore_io(int saved_stdin, int saved_stdout);
-int		setup_heredoc_delim(t_command *cmd, char *delim);
+int		setup_heredoc_delim(t_command *cmd, t_mini *mini, char *delim);
 int		setup_input_redir_file(t_command *cmd, char *file);
 int		setup_output_redir_file(t_command *cmd, char *file, int append);
 int		apply_redirections(t_command *cmd);

@@ -97,7 +97,7 @@ static void	exec_pipe_command(t_mini *mini, int cmd_idx)
 		status = execute_builtin(mini, cmd_idx);
 		if (cmd_idx == mini->num_commands - 1)
 			mini->exit_status = status;
-		exit(status);
+		clean_exit(mini);
 	}
 	path = get_command_path(mini->commands[cmd_idx].args[0], mini->env);
 	if (!path)
@@ -105,7 +105,8 @@ static void	exec_pipe_command(t_mini *mini, int cmd_idx)
 		ft_putstr_fd("minishell: ", 2);
 		ft_putstr_fd(mini->commands[cmd_idx].args[0], 2);
 		ft_putendl_fd(": command not found", 2);
-		exit(127);
+		mini->exit_status = 127;
+		clean_exit(mini);
 	}
 	execve(path, mini->commands[cmd_idx].args, env_list_to_array(mini->env));
 	perror("execve failed");

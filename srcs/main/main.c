@@ -59,13 +59,9 @@ void	process_input_line(char *line, t_mini *mini)
 	if (parse_and_execute(line, mini, lex_data) == ERROR)
 	{
 		free(line);
-		if (!lex_data)
-			free(lex_data);
 		return ;
 	}
 	free(line);
-	if (!lex_data)
-		free(lex_data);
 }
 
 void	main_loop(t_mini *mini)

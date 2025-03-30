@@ -133,7 +133,7 @@ int	preprocess_heredocs(t_mini *mini)
 		{
 			if (redir->type == TOKEN_HEREDOC)
 			{
-				if (setup_heredoc_delim(cmd, redir->file) == ERROR)
+				if (setup_heredoc_delim(cmd, mini, redir->file) == ERROR)
 					return (ERROR);
 				redir->processed = 1;
 			}

@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/23 12:33:39 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/30 15:04:02 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/31 13:52:13 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,13 +79,12 @@ static int	add_redirection(t_command *cmd, t_redirection *new_redir)
  * Skips intervening IFS (whitespace) tokens.
  * Advances the token list pointer to the next non-redirection token.
  */
-static int	handle_redirect_parse(t_mini *mini, t_command *cmd, t_list **temp)
+static int	handle_redirect_parse(t_command *cmd, t_list **temp)
 {
 	t_token			*type_token;
 	t_token			*file_token;
 	t_redirection	*new_redir;
 
-	(void)mini;
 	type_token = (t_token *)(*temp)->content;
 	if (!(*temp)->next)
 		return (ERROR);
@@ -134,7 +133,7 @@ static int	process_token_parse(t_mini *mini, t_token *token,
 		return (SUCCESS);
 	}
 	if (token->token >= TOKEN_REDIR_IN && token->token <= TOKEN_HEREDOC)
-		return (handle_redirect_parse(mini, cmd, temp));
+		return (handle_redirect_parse(cmd, temp));
 	if (token->token == TOKEN_WORD || token->token == TOKEN_VARIABLE)
 		return (handle_word_var(mini, cmd, token, &idx[1]));
 	if (token->token == TOKEN_SINGLE_Q_STRING)

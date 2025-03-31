@@ -2,7 +2,7 @@
 NAME = minishell
 
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -g
+CFLAGS = -Wall -Wextra -Werror
 RL_FLAGS = -lreadline
 
 GREEN   = \033[0;32m
@@ -73,7 +73,7 @@ $(LIBFT):
 
 $(OBJ_DIR)%.o: srcs/%.c
 	@mkdir -p $(dir $@)
-	@echo "$(YELLOW)Compiling: $<$(CLEAR)"
+	@echo "$(GREEN)Compiling: $<$(CLEAR)"
 	@$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 %.o: %.c

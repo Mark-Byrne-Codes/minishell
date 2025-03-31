@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 09:13:29 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/26 11:17:18 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/31 09:51:11 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@ int	init_commands(t_mini *mini, int num_commands)
 	i = 0;
 	while (i < num_commands)
 	{
-		ft_memset(&mini->commands[i], 0, sizeof(t_command));
 		mini->commands[i].fd_in = STDIN_FILENO;
 		mini->commands[i].fd_out = STDOUT_FILENO;
 		mini->commands[i].pipe_read = -1;

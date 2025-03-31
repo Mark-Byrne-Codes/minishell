@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/23 15:39:26 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/27 10:43:39 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/31 15:17:00 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,10 @@ int	parse_and_execute(char *line, t_mini *mini)
 	if (mini->num_commands > 0 && execute_commands(mini) == ERROR)
 	{
 		free_commands(mini);
+		cleanup_on_token_error(mini->lexer_data, 0);
+		free(mini->lexer_data);
 		mini->exit_status = ERROR;
+		mini->lexer_data = NULL;
 		return (ERROR);
 	}
 	free_commands(mini);

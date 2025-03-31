@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 15:09:57 by elehtone          #+#    #+#             */
-/*   Updated: 2025/03/27 11:44:45 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/03/31 09:45:27 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,20 +81,6 @@ static void	*process_character(t_lexer *lexer, char *command)
 }
 
 /**
- * @brief Populates the token list by processing each character
- * 
- * @param lexer Lexer structure
- * @param command Command string to tokenize
- */
-static void	populate_token_list(t_lexer *lexer, char *command)
-{
-	while (*command)
-	{
-		command = process_character(lexer, command);
-	}
-}
-
-/**
  * @brief Main parsing function that tokenizes and processes a command line
  * 
  * @param lexer Lexer structure to populate
@@ -107,7 +93,10 @@ int	parse_line(t_lexer *lexer, char *command, t_mini *mini)
 	int	ret;
 
 	init_lexer(lexer);
-	populate_token_list(lexer, command);
+	while (*command)
+	{
+		command = process_character(lexer, command);
+	}
 	ret = init_commands(mini, lexer->pipes + 1);
 	if (ret == ERROR)
 	{

@@ -128,8 +128,6 @@ static int	execute_child_process(t_mini *mini, int cmd_idx, char *cmd_path)
 	pid = fork();
 	if (pid == 0)
 	{
-		if (is_builtin)
-			exit(execute_builtin(mini, cmd_idx));
 		close_other_pipes(mini, cmd_idx);
 		env_array = env_list_to_array(mini->env);
 		execve(cmd_path, args, env_array);
@@ -162,8 +160,6 @@ int	launch_external(t_mini *mini, int cmd_idx)
 
 	if (!mini->commands[cmd_idx].args || !mini->commands[cmd_idx].args[0])
 		return (SUCCESS);
-	if (mini->commands[cmd_idx].is_builtin)
-		return (execute_child_process(mini, cmd_idx, NULL));
 	cmd_path = get_command_path(mini->commands[cmd_idx].args[0], mini->env);
 	is_allocated = (cmd_path != mini->commands[cmd_idx].args[0]);
 	if (!cmd_path)

@@ -131,11 +131,9 @@ int	execute_commands(t_mini *mini)
 {
 	int	i;
 	int	status;
-	int	pipe_failed;
 	int	saved_fds[2];
 
 	i = 0;
-	pipe_failed = 0;
 	status = 0;
 	if (preprocess_heredocs(mini) == ERROR)
 		return (ERROR);
@@ -147,7 +145,7 @@ int	execute_commands(t_mini *mini)
 		status = execute_single_command(mini, i);
 	close_fds(&mini->commands[i]);
 	restore_io(saved_fds[0], saved_fds[1]);
-	if (mini->num_commands == 1 && mini->commands[0].error)
+	if (mini->commands[0].error)
 		mini->exit_status = 1;
-	return (wait_for_children(mini, pipe_failed * 1 + !pipe_failed * status));
+	return (wait_for_children(mini, status));
 }

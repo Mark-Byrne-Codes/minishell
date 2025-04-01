@@ -97,17 +97,16 @@ int	parse_line(t_lexer *lexer, char *command, t_mini *mini)
 	{
 		command = process_character(lexer, command);
 		if (!command)
-		{
-			cleanup_lexer(lexer);
 			return (ERROR);
-		}
+	}
+	if (lexer->squote || lexer->dquote)
+	{
+		ft_putstr_fd("minishell: unclosed quote\n", 2);
+		return (ERROR);
 	}
 	ret = init_commands(mini, lexer->pipes + 1);
 	if (ret == ERROR)
-	{
-		cleanup_lexer(lexer);
 		return (ERROR);
-	}
 	if (concat_adjacent_strings(lexer) == ERROR)
 		return (ERROR);
 	ret = process_tokens(mini, lexer);

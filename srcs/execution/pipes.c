@@ -92,6 +92,8 @@ static void	exec_pipe_command(t_mini *mini, int cmd_idx)
 	char	*path;
 	int		status;
 
+	if (!mini->commands[cmd_idx].args || !mini->commands[cmd_idx].args[0])
+		clean_exit(mini);
 	if (mini->commands[cmd_idx].is_builtin)
 	{
 		status = execute_builtin(mini, cmd_idx);

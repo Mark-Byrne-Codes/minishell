@@ -1,0 +1,1 @@
+-e #!/bin/bash\necho "Hello from mybin!"

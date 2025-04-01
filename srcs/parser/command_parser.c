@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/23 12:33:39 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/31 13:52:13 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/04/01 11:47:24 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,10 @@ static int	handle_redirect_parse(t_command *cmd, t_list **temp)
 	file_token = (t_token *)(*temp)->content;
 	new_redir = create_redirection(type_token, file_token);
 	if (add_redirection(cmd, new_redir) == ERROR)
+	{
+		perror("Error adding redirection");
 		return (ERROR);
+	}
 	*temp = (*temp)->next;
 	return (SUCCESS);
 }
@@ -119,7 +122,7 @@ static int	handle_redirect_parse(t_command *cmd, t_list **temp)
  * - Single quotes are handled literally
  * - IFS tokens are skipped
  */
-static int	process_token_parse(t_mini *mini, t_token *token,
+int	process_token_parse(t_mini *mini, t_token *token,
 						t_list **temp, int *idx)
 {
 	t_command	*cmd;
@@ -161,21 +164,25 @@ int	process_tokens(t_mini *mini, t_lexer *lexer)
 	t_list	*temp;
 	t_token	*token;
 	int		idx[2];
+	int		is_first_token;
 
-	if (concat_adjacent_strings(lexer) == ERROR)
-		return (ERROR);
 	temp = lexer->dictionary;
 	idx[0] = 0;
 	idx[1] = 0;
+	is_first_token = 1;
 	while (temp)
 	{
 		token = (t_token *)temp->content;
-		if (process_token_parse(mini, token, &temp, idx) == ERROR)
-			return (ERROR);
-		if (token->token != TOKEN_PIPE && token->token != TOKEN_IFS
-			&& !(token->token >= TOKEN_REDIR_IN
-				&& token->token <= TOKEN_HEREDOC))
+		if (token->token == TOKEN_IFS)
+		{
 			temp = temp->next;
+			continue ;
+		}
+		if (validate_token_sequence(token, temp, is_first_token) == ERROR)
+			return (ERROR);
+		is_first_token = 0;
+		if (process_current_token(mini, &temp, idx) == ERROR)
+			return (ERROR);
 	}
 	return (SUCCESS);
 }

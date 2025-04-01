@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 08:50:10 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/26 12:54:45 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/04/01 10:00:33 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,7 +146,6 @@ char	*get_prompt(void)
 
 	if (!getcwd(cwd, sizeof(cwd)))
 	{
-		perror("getcwd");
 		return (ft_strdup("minishell> "));
 	}
 	modified_cwd = replace_home_with_tilde(cwd, getenv("HOME"));

@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 15:09:57 by elehtone          #+#    #+#             */
-/*   Updated: 2025/03/31 09:45:27 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/04/01 11:41:20 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,11 @@ int	parse_line(t_lexer *lexer, char *command, t_mini *mini)
 	while (*command)
 	{
 		command = process_character(lexer, command);
+		if (!command)
+		{
+			cleanup_lexer(lexer);
+			return (ERROR);
+		}
 	}
 	ret = init_commands(mini, lexer->pipes + 1);
 	if (ret == ERROR)
@@ -103,6 +108,8 @@ int	parse_line(t_lexer *lexer, char *command, t_mini *mini)
 		cleanup_lexer(lexer);
 		return (ERROR);
 	}
+	if (concat_adjacent_strings(lexer) == ERROR)
+		return (ERROR);
 	ret = process_tokens(mini, lexer);
 	cleanup_lexer(lexer);
 	return (ret);

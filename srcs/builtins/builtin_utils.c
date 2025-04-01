@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 09:17:23 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/26 15:56:03 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/04/01 10:51:06 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,6 +131,7 @@ int	execute_builtin(t_mini *mini, int cmd_idx)
 	if (handle_io_for_builtin(mini, cmd, &saved_stdin, &saved_stdout) == ERROR)
 		return (ERROR);
 	result = execute_simple_builtin(mini, cmd);
+	mini->exit_status = result;
 	if (result == 0)
 		result = execute_complex_builtin(mini, cmd);
 	restore_io(saved_stdin, saved_stdout);

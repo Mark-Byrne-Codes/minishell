@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 09:17:19 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/26 15:56:58 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/04/01 09:15:54 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,7 +136,7 @@ int	cd_builtin(t_mini *mini, char **args)
 		ft_putstr_fd("minishell: cd: too many arguments\n", STDERR_FILENO);
 		return (1);
 	}
-	if (arg_count == 1)
+	if (arg_count == 1 || (arg_count == 2 && ft_strcmp(args[1], "~") == 0))
 	{
 		path = getenv("HOME");
 		if (!path)

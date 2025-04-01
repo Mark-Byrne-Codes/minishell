@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 13:00:40 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/27 11:44:18 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/04/01 10:09:07 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,4 +89,31 @@ char	*get_command_path(char *cmd, t_env *env)
 	}
 	free_string_array(dirs);
 	return (NULL);
+}
+
+int	is_valid_cwd(void)
+{
+	char		cwd[PATH_MAX];
+	struct stat	st;
+
+	if (!getcwd(cwd, sizeof(cwd)))
+		return (0);
+	if (stat(cwd, &st) == -1)
+		return (0);
+	return (S_ISDIR(st.st_mode));
+}
+
+void	reset_to_valid_dir(void)
+{
+	char	*home;
+
+	home = getenv("HOME");
+	if (home && is_valid_cwd())
+		return ;
+	if (!home || chdir(home) != 0)
+	{
+		chdir("/");
+		ft_putstr_fd("minishell: ", STDERR_FILENO);
+		ft_putendl_fd(strerror(errno), STDERR_FILENO);
+	}
 }

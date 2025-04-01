@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/23 14:55:49 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/31 15:09:37 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/04/01 08:44:56 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,12 +118,10 @@ void	close_other_pipes(t_mini *mini, int cmd_idx)
 static int	execute_child_process(t_mini *mini, int cmd_idx, char *cmd_path)
 {
 	pid_t	pid;
-	int		is_builtin;
 	char	**args;
 	int		exit_status;
 	char	**env_array;
 
-	is_builtin = mini->commands[cmd_idx].is_builtin;
 	args = mini->commands[cmd_idx].args;
 	pid = fork();
 	if (pid == 0)

@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/23 15:14:33 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/27 14:10:26 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/04/01 11:40:38 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,4 +77,14 @@ void	cleanup_lexer(t_lexer *lexer)
 		return ;
 	if (lexer->dictionary)
 		ft_lstclear(&lexer->dictionary, free_token);
+}
+
+void	print_syntax_error(const char *token_str)
+{
+	ft_putstr_fd("minishell: syntax error near unexpected token `", 2);
+	if (token_str)
+		ft_putstr_fd((char *)token_str, 2);
+	else
+		ft_putstr_fd("newline", 2);
+	ft_putendl_fd("'", 2);
 }

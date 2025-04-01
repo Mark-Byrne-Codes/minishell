@@ -6,41 +6,11 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:54:23 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/27 11:44:55 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/04/01 09:15:08 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
-
-/**
- * @brief Expands tilde (~) to home directory path
- * 
- * @param mini Minishell context
- * @param str String containing potential tilde
- * @return char* Expanded string or original if no expansion
- * 
- * @note Only expands:
- * - Lone ~ to home directory
- * - ~/ to home directory path prefix
- * Preserves other cases unchanged
- */
-char	*expand_tilde(t_mini *mini, char *str)
-{
-	char	*home_dir;
-	char	*result;
-
-	if (str[0] != '~' || (str[1] != '\0' && str[1] != '/'))
-		return (ft_strdup(str));
-	home_dir = get_env_value(mini->env, "HOME");
-	if (!home_dir)
-		return (ft_strdup(str));
-	if (str[1] == '\0')
-		return (ft_strdup(home_dir));
-	result = ft_strjoin(home_dir, str + 1);
-	if (!result)
-		return (ft_strdup(str));
-	return (result);
-}
 
 /**
  * @brief Main token expansion function
@@ -62,7 +32,7 @@ char	*expand_token(t_mini *mini, t_token *token)
 
 	if (token->token == TOKEN_SINGLE_Q_STRING)
 		return (ft_strdup(token->string));
-	expanded = expand_tilde(mini, token->string);
+	expanded = ft_strdup(token->string);
 	if (!expanded)
 		return (NULL);
 	if (token->token != TOKEN_SINGLE_Q_STRING)

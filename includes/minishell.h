@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/23 15:14:33 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/30 15:52:02 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/04/01 12:15:34 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,11 +44,11 @@ typedef enum e_token_type
 	TOKEN_IFS
 }	t_token_type;
 
-enum e_status
+typedef enum e_status
 {
 	SUCCESS = 0,
 	ERROR = 1
-};
+}	t_status;
 
 typedef struct s_lexer
 {
@@ -175,6 +175,7 @@ int		init_mini(t_mini *mini, char **envp);
 int		init_commands(t_mini *mini, int num_commands);
 int		prepare_command(t_mini *mini, int i, int flags, int *saved_fds);
 int		add_argument(t_command *cmd, char *arg, int arg_idx);
+int		is_operator(t_token_type type);
 void	free_commands(t_mini *mini);
 
 /* Error Handling & Signal Handling */
@@ -185,6 +186,17 @@ void	signal_handler_heredoc(int signum);
 void	setup_heredoc_signals(void);
 void	restore_default_signals(void);
 void	signal_handler_interactive(int signum);
+void	reset_to_valid_dir(void);
+void	print_syntax_error(const char *token_str);
+t_token	*get_next_non_ifs_token(t_list *current);
+int		validate_token_sequence(t_token *token, t_list *current_node,
+			int is_first);
+int		process_current_token(t_mini *mini, t_list **current_node_ptr,
+			int *idx);
+int		process_token_parse(t_mini *mini, t_token *token, t_list **temp,
+			int *idx);
+int		is_whitespace_character(unsigned int c);
+int		is_quote_character(unsigned int c);
 
 /* Prompt & Variable Expansion */
 char	*get_prompt(void);
@@ -200,15 +212,12 @@ void	*handle_single_quoted_string(t_lexer *lexer, char *command);
 void	init_lexer(t_lexer *lexer);
 void	*add_token_to_list(t_lexer *lexer, char *str, int len, t_token_type t);
 void	toggle_quote_state(int *flag);
-int		is_whitespace_character(unsigned int c);
 void	cleanup_on_token_error(t_lexer *lexer, int end);
-int		is_quote_character(unsigned int c);
 void	cleanup_lexer(t_lexer *lexer);
 
 /* Token Expansion */
 char	*expand_token(t_mini *mini, t_token *token);
 char	*expand_variables(t_mini *mini, char *str, int in_quotes);
-char	*expand_tilde(t_mini *mini, char *str);
 void	free_token(void *content);
 
 /* Token Handling */

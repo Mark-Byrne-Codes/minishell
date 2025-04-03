@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/12 11:16:37 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/30 13:33:08 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/04/03 14:34:18 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,8 +110,8 @@ static void	exec_pipe_command(t_mini *mini, int cmd_idx)
 		mini->exit_status = 127;
 		clean_exit(mini);
 	}
-	execve(path, mini->commands[cmd_idx].args, env_list_to_array(mini->env));
-	perror("execve failed");
+	execute_external_command(mini, cmd_idx, path);
+	free(path);
 	mini->exit_status = 126;
 	clean_exit(mini);
 }

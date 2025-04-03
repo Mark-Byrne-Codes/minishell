@@ -34,8 +34,9 @@ SRCS_BUILTINS = srcs/builtins/exit_builtin.c \
 				srcs/builtins/builtin_utils.c
 
 SRCS_UTILS	= srcs/utils/free.c \
-			  srcs/utils/helpers.c \
-			  srcs/utils/error.c
+			  srcs/utils/utils.c \
+			  srcs/utils/error.c \
+			  srcs/utils/string_utils.c \
 
 SRCS_ENV	= srcs/env/env.c \
 			  srcs/env/env_utils.c

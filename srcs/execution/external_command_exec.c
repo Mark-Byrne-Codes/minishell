@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/23 14:55:49 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/04/01 08:44:56 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/04/03 12:24:22 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,20 +118,15 @@ void	close_other_pipes(t_mini *mini, int cmd_idx)
 static int	execute_child_process(t_mini *mini, int cmd_idx, char *cmd_path)
 {
 	pid_t	pid;
-	char	**args;
 	int		exit_status;
-	char	**env_array;
 
-	args = mini->commands[cmd_idx].args;
 	pid = fork();
 	if (pid == 0)
 	{
 		close_other_pipes(mini, cmd_idx);
-		env_array = env_list_to_array(mini->env);
-		execve(cmd_path, args, env_array);
-		free_string_array(env_array);
+		execute_external_command(mini, cmd_idx, cmd_path);
 		exit_status = handle_execution_error(mini, cmd_idx);
-		exit(exit_status);
+		clean_exit(mini);
 	}
 	else if (pid < 0)
 		return (ERROR);

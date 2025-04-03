@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/12 11:16:34 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/31 15:11:12 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/04/03 12:56:19 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ int	handle_pipe_setup(t_mini *mini, int i)
  * 
  * param cmd Pointer to the command structure
  */
-static void	close_fds(t_command *cmd)
+void	close_fds(t_command *cmd)
 {
 	if (cmd->pipe_write != -1)
 	{

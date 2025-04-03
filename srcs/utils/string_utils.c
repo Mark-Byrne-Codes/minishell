@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   helpers.c                                          :+:      :+:    :+:   */
+/*   string_utils.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/23 13:48:06 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/03/27 14:10:21 by mbyrne           ###   ########.fr       */
+/*   Created: 2025/04/03 09:52:58 by mbyrne            #+#    #+#             */
+/*   Updated: 2025/04/03 14:35:27 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,30 +121,6 @@ char	*remove_quotes(const char *str)
 	}
 	result[j] = '\0';
 	return (result);
-}
-
-/**
- * @brief Restores standard input/output to original state
- * 
- * @param saved_stdin Saved stdin file descriptor
- * @param saved_stdout Saved stdout file descriptor
- * 
- * @note Only restores if the saved descriptors differ from STDIN/STDOUT
- * @note Closes the saved descriptors after restoration
- * @note Typically used after command execution with redirected I/O
- */
-void	restore_io(int saved_stdin, int saved_stdout)
-{
-	if (saved_stdin != STDIN_FILENO)
-	{
-		dup2(saved_stdin, STDIN_FILENO);
-		close(saved_stdin);
-	}
-	if (saved_stdout != STDOUT_FILENO)
-	{
-		dup2(saved_stdout, STDOUT_FILENO);
-		close(saved_stdout);
-	}
 }
 
 /**

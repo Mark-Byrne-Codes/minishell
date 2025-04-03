@@ -6,7 +6,7 @@
 /*   By: mbyrne <mbyrne@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/23 15:14:33 by mbyrne            #+#    #+#             */
-/*   Updated: 2025/04/01 12:15:34 by mbyrne           ###   ########.fr       */
+/*   Updated: 2025/04/03 12:56:35 by mbyrne           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,9 +174,11 @@ void	close_other_pipes(t_mini *mini, int cmd_idx);
 int		init_mini(t_mini *mini, char **envp);
 int		init_commands(t_mini *mini, int num_commands);
 int		prepare_command(t_mini *mini, int i, int flags, int *saved_fds);
+void	close_fds(t_command *cmd);
 int		add_argument(t_command *cmd, char *arg, int arg_idx);
 int		is_operator(t_token_type type);
 void	free_commands(t_mini *mini);
+void	execute_external_command(t_mini *mini, int cmd_idx, char *cmd_path);
 
 /* Error Handling & Signal Handling */
 int		handle_file_open_error(t_command *cmd, char *filename);

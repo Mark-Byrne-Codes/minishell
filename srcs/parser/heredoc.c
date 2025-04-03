@@ -144,6 +144,8 @@ static int	handle_parent_process(t_command *cmd, int pipe_fd[2], pid_t pid)
 		signal(SIGQUIT, SIG_IGN);
 		return (ERROR);
 	}
+	if (cmd->has_input_redir && cmd->fd_in != STDIN_FILENO)
+		close(cmd->fd_in);
 	cmd->fd_in = pipe_fd[0];
 	cmd->has_input_redir = 1;
 	cmd->is_heredoc = 1;

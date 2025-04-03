@@ -40,7 +40,8 @@ static int	validate_operator_sequence(t_list *current_node)
 
 	next_token = get_next_non_ifs_token(current_node);
 	if (!next_token || (is_operator(next_token->token) && \
-		next_token->token != TOKEN_REDIR_OUT))
+		next_token->token != TOKEN_REDIR_OUT && \
+		next_token->token != TOKEN_REDIR_APPEND))
 	{
 		if (next_token)
 		{

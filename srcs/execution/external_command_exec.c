@@ -118,14 +118,13 @@ void	close_other_pipes(t_mini *mini, int cmd_idx)
 static int	execute_child_process(t_mini *mini, int cmd_idx, char *cmd_path)
 {
 	pid_t	pid;
-	int		exit_status;
 
 	pid = fork();
 	if (pid == 0)
 	{
 		close_other_pipes(mini, cmd_idx);
 		execute_external_command(mini, cmd_idx, cmd_path);
-		exit_status = handle_execution_error(mini, cmd_idx);
+		mini->exit_status = handle_execution_error(mini, cmd_idx);
 		clean_exit(mini);
 	}
 	else if (pid < 0)

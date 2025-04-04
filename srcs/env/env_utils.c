@@ -103,32 +103,31 @@ t_env	*copy_env(char **envp)
  * @note Allocates new memory for the array and strings
  * Returns NULL on allocation failure after freeing partial results
  */
-char	**env_list_to_array(t_env *head)
+char	**env_list_to_array(t_env *h)
 {
-	char	**env_array;
-	t_env	*current;
+	char	**arr;
 	int		i;
-	int		count;
+	int		c;
+	char	*tmp;
 
-	count = count_nodes(head);
-	env_array = (char **)malloc(sizeof(char *) * (count + 1));
-	if (!env_array)
+	c = count_nodes(h);
+	arr = ft_calloc(c + 1, sizeof(char *));
+	if (!arr || !h)
 		return (NULL);
-	current = head;
 	i = 0;
-	while (current)
+	while (h)
 	{
-		env_array[i] = ft_strjoin(current->name, "=");
-		if (!env_array[i])
-			return (free_string_array(env_array), NULL);
-		env_array[i] = join_and_free(env_array[i], ft_strdup(current->value));
-		if (!env_array[i])
-			return (free_string_array(env_array), NULL);
-		current = current->next;
-		i++;
+		if (h->name && h->value)
+		{
+			tmp = ft_strjoin(h->name, "=");
+			arr[i++] = ft_strjoin(tmp, h->value);
+			free(tmp);
+			if (!arr[i - 1])
+				return (free_string_array(arr), NULL);
+		}
+		h = h->next;
 	}
-	env_array[i] = NULL;
-	return (env_array);
+	return (arr);
 }
 
 /**
